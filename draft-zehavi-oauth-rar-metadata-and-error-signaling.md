@@ -34,6 +34,7 @@ author:
     email: aaron@parecki.com
 
 normative:
+  RFC3986:
   RFC6749:
   RFC8414:
   RFC9396:
@@ -160,7 +161,7 @@ Here comes another drawing.
 
 This document defines a new metadata attribute, `authorization_details_types_metadata`, which provides documentation and validation information for authorization details types used with Rich Authorization Requests {{RFC9396}}.
 
-The metadata MAY be published by OAuth Authorization Servers using Authorization Server Metadata {{RFC9126}} as well as by OAuth Resource Servers using Resource Server Metadata {{RFC9728}}.
+The metadata MAY be published by OAuth Authorization Servers using Authorization Server Metadata {{RFC8414}} as well as by OAuth Resource Servers using Resource Server Metadata {{RFC9728}}.
 
 Clients MAY use this metadata to dynamically construct valid `authorization_details` objects.
 
@@ -291,162 +292,6 @@ IANA has (TBD) registered the following values in the IANA "OAuth Parameters" re
 
 This section provides non-normative examples of how this specification may be used to support specific use cases.
 
-## Native client federated and redirected to app
-
-### Diagram
-
-~~~ ascii-art
-                                                +--------------------+
-                                                |   Authorization    |
-                          (B)Native             |      Server 1      |
-             +----------+ Authorization Request |+------------------+|
-(A)User  +---|          |---------------------->||     Native       ||
-   Starts|   |          |                       ||  Authorization   ||
-   Flow  +-->|  Client  |<----------------------||    Endpoint      ||
-             |          | (C)Federate Error     |+------------------+|
-             |          |        Response       +--------------------+
-             |          |         :
-             |          |         :             +--------------------+
-             |          |         :             |   Authorization    |
-             |          | (D)Native             |      Server 2      |
-             |          | Authorization Request |+------------------+|
-             |          |---------------------->||     Native       ||
-             |          |                       ||  Authorization   ||
-             |          |<----------------------||    Endpoint      ||
-             |          | (E) Redirect to       |+------------------+|
-             |          |     App Response      +--------------------+
-             |          |         :
-             |          |         :             +--------------------+
-             |          | (F) Invoke App        |                    |
-             |          |---------------------->|   Native App of    |
-             |          |                       |   Auth Server 2    |
-             |          |<----------------------|                    |
-             |          | (G)Authorization code +--------------------+
-             |          |   For Auth Server 1
-             |          |         :             +--------------------+
-             |          |         :             |   Authorization    |
-             |          | (H)Authorization Code |      Server 1      |
-             |          |    For Auth Server 1  |+------------------+|
-             |          |---------------------->||    Response      ||
-             |          |                       ||       Uri        ||
-             |          |<----------------------||    Endpoint      ||
-             |          | (I) Authorization     |+------------------+|
-             |          |     Code Response     |                    |
-             |          |         :             |                    |
-             |          |         :             |                    |
-             |          | (J) Token Request     |+------------------+|
-             |          |---------------------->||      Token       ||
-             |          |                       ||     Endpoint     ||
-             |          |<----------------------||                  ||
-             |          | (K) Access Token      |+------------------+|
-             |          |                       +--------------------+
-             |          |
-             +----------+
-~~~
-Figure: Native client federated, then redirected to app
-
-### Client makes initial request and receives "federate" error
-
-Client calls the native authorization endpoint and includes the *native_callback_uri* parameter:
-
-    POST /native-authorization HTTP/1.1
-    Host: as-1.com
-    Content-Type: application/x-www-form-urlencoded
-
-    client_id=t7CieSlru4&native_callback_uri=
-    https://client.example.com/cb
-
-The first authorization server, as-1.com, decides to federate to as-2.com after validating
-it supports the native authorization endpoint. If it does not, as-1.com returns:
-
-    HTTP/1.1 400 Bad Request
-    Content-Type: application/json
-
-    {
-        "error": "native_authorization_federate_unsupported"
-    }
-
-If native authorization endpoint is supported by the federated authorization server,
-as-1.com performs a PAR request to as-2.com's pushed authorization endpoint,
-including the original *native_callback_uri*:
-
-    POST /par HTTP/1.1
-    Host: as-2.com
-    Content-Type: application/x-www-form-urlencoded
-
-    client_id=s6BhdRkqt3&native_callback_uri=
-    https://client.example.com/cb
-
-as-1.com receives a request_uri from as-2.com's PAR endpoint, which it
-includes in its response to client, in the *federation_body* attribute:
-
-    HTTP/1.1 400 Bad Request
-    Content-Type: application/json
-
-    {
-        "error": "federate",
-        "auth_session": "ce6772f5e07bc8361572f",
-        "response_uri": "https://as-1.com/native-authorization",
-        "federation_uri": "https://as-2.com/native-authorization",
-        "federation_body": "client_id=s6BhdRkqt3&request_uri=
-          urn:ietf:params:oauth:request_uri:R3p_hzwsR7outNQSKfoX"
-    }
-
-See {{federating-response}} for more details.
-
-### Client calls federated authorization server and is redirected to app
-
-Client calls the *federation_uri* it got from as-1.com using HTTP POST with
-*federation_body* as application/x-www-form-urlencoded request body:
-
-    POST /native-authorization HTTP/1.1
-    Host: as-2.com
-    Content-Type: application/x-www-form-urlencoded
-
-    client_id=s6BhdRkqt3&request_uri=
-    urn:ietf:params:oauth:request_uri:R3p_hzwsR7outNQSKfoX
-
-as-2.com decides to use its native app to interact with end-user and responds:
-
-    HTTP/1.1 400 Bad Request
-    Content-Type: application/json
-
-    {
-        "error": "redirect_to_app",
-        "deep_link": "https://as-2.com/native-authorization?
-          client_id=s6BhdRkqt3&request_uri=
-          urn:ietf:params:oauth:request_uri:R3p_hzwsR7outNQSKfoX"
-    }
-
-Client locates an app claiming the obtained deep_link and invokes it.
-See {{redirect-to-app-response}} for more details.
-The invoked app handles the native authorization request and then natively invokes native_callback_uri:
-
-    https://client.example.com/cb?authorization_code=uY29tL2F1dGhlbnRpY
-
-### Client calls federating authorization server
-
-Client invokes the response_uri of as-1.com as it is the authorization server which federated
-it to as-2.com and the app's response is regarded as the response of as-2.com:
-
-    POST /native-authorization HTTP/1.1
-    Host: as-1.com
-    Content-Type: application/x-www-form-urlencoded
-
-    authorization_code=uY29tL2F1dGhlbnRpY
-    &auth_session=ce6772f5e07bc8361572f
-
-And receives in response an authorization code, which it is the audience of (no further federations) to resolve:
-
-    HTTP/1.1 200 OK
-    Content-Type: application/json
-
-    {
-      "authorization_code": "vZ3:uM3G2eHimcoSqjZ"
-    }
-
-Client proceeds to exchange code for tokens.
-
 # Document History
 
 -00
@@ -456,5 +301,3 @@ Client proceeds to exchange code for tokens.
 
 # Acknowledgments
 {:numbered="false"}
-
-The authors would like to thank the attendees of IETFs 123 & 124 in which this was discussed, as well as the following individuals who contributed ideas, feedback, and wording that shaped and formed the final specification: George Fletcher, Arndt Schwenkshuster, Filip Skokan.

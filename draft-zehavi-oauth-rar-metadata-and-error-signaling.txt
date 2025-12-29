@@ -92,7 +92,7 @@ Table of Contents
      4.3.  Metadata Structure
      4.4.  Metadata Attributes
      4.5.  Metadata Examples
-       4.5.1.  Example Authorization Detail Type Metadata: Payment
+       4.5.1.  Example Authorization Server RAR Metadata: Payment
                Initiation
    5.  Resource Server Error Signaling with
            insufficient_authorization_details
@@ -314,30 +314,74 @@ Table of Contents
 
 4.5.  Metadata Examples
 
-4.5.1.  Example Authorization Detail Type Metadata: Payment Initiation
+4.5.1.  Example Authorization Server RAR Metadata: Payment Initiation
 
 {
     "authorization_details_types_supported": ["payment_initiation"],
     "authorization_details_types_metadata": {
         "payment_initiation": {
             "version": "1.0",
-            "description": "Authorization to initiate a single payment.",
+            "description": "Authorization to initiate a single payment from a payer account to a creditor account.",
             "documentation_uri": "https://example.com/docs/payment-initiation",
             "schema": {
                 "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "title": "Payment Initiation Authorization Detail",
                 "type": "object",
-                "required": ["type", "instructed_amount", "creditor_account"],
+                "required": [
+                    "type",
+                    "instructed_amount",
+                    "creditor_account"
+                ],
                 "properties": {
                     "type": {
-                        "const": "payment_initiation"
+                        "const": "payment_initiation",
+                        "description": "Authorization detail type identifier."
+                    },
+                    "actions": {
+                        "type": "array",
+                        "description": "Permitted actions for this authorization.",
+                        "items": {
+                            "type": "string",
+                            "enum": ["initiate"]
+                        },
+                        "minItems": 1,
+                        "uniqueItems": true
                     },
                     "instructed_amount": {
                         "type": "object",
-                        "required": ["currency", "amount"]
+                        "description": "Amount and currency of the payment to be initiated.",
+                        "required": ["currency", "amount"],
+                        "properties": {
+                            "currency": {
+                                "type": "string",
+                                "description": "ISO 4217 currency code.",
+                                "pattern": "^[A-Z]{3}$"
+                            },
+                            "amount": {
+                                "type": "string",
+                                "description": "Decimal monetary amount represented as a string.",
+                                "pattern": "^[0-9]+(\\.[0-9]{1,2})?$"
+                            }
+                        },
+                        "additionalProperties": false
                     },
                     "creditor_account": {
                         "type": "object",
-                        "required": ["iban"]
+                        "description": "Account to which the payment will be credited.",
+                        "required": ["iban"],
+                        "properties": {
+                            "iban": {
+                                "type": "string",
+                                "description": "International Bank Account Number (IBAN).",
+                                "pattern": "^[A-Z0-9]{15,34}$"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "remittance_information": {
+                        "type": "string",
+                        "description": "Unstructured remittance information for the payment.",
+                        "maxLength": 140
                     }
                 },
                 "additionalProperties": false

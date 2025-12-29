@@ -1184,7 +1184,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
                 <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-metadata-examples" class="internal xref">Metadata Examples</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5.2.1">
-                    <p id="section-toc.1-1.4.2.5.2.1.1"><a href="#section-4.5.1" class="auto internal xref">4.5.1</a>.  <a href="#name-example-authorization-detai" class="internal xref">Example Authorization Detail Type Metadata: Payment Initiation</a></p>
+                    <p id="section-toc.1-1.4.2.5.2.1.1"><a href="#section-4.5.1" class="auto internal xref">4.5.1</a>.  <a href="#name-example-authorization-serve" class="internal xref">Example Authorization Server RAR Metadata: Payment Initiation</a></p>
 </li>
                 </ul>
 </li>
@@ -1475,10 +1475,10 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         <h3 id="name-metadata-examples">
 <a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-metadata-examples" class="section-name selfRef">Metadata Examples</a>
         </h3>
-<div id="example-authorization-detail-type-metadata-payment-initiation">
+<div id="example-authorization-server-rar-metadata-payment-initiation">
 <section id="section-4.5.1">
-          <h4 id="name-example-authorization-detai">
-<a href="#section-4.5.1" class="section-number selfRef">4.5.1. </a><a href="#name-example-authorization-detai" class="section-name selfRef">Example Authorization Detail Type Metadata: Payment Initiation</a>
+          <h4 id="name-example-authorization-serve">
+<a href="#section-4.5.1" class="section-number selfRef">4.5.1. </a><a href="#name-example-authorization-serve" class="section-name selfRef">Example Authorization Server RAR Metadata: Payment Initiation</a>
           </h4>
 <div class="alignLeft art-text artwork" id="section-4.5.1-1">
 <pre>
@@ -1487,23 +1487,67 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
     "authorization_details_types_metadata": {
         "payment_initiation": {
             "version": "1.0",
-            "description": "Authorization to initiate a single payment.",
+            "description": "Authorization to initiate a single payment from a payer account to a creditor account.",
             "documentation_uri": "https://example.com/docs/payment-initiation",
             "schema": {
                 "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "title": "Payment Initiation Authorization Detail",
                 "type": "object",
-                "required": ["type", "instructed_amount", "creditor_account"],
+                "required": [
+                    "type",
+                    "instructed_amount",
+                    "creditor_account"
+                ],
                 "properties": {
                     "type": {
-                        "const": "payment_initiation"
+                        "const": "payment_initiation",
+                        "description": "Authorization detail type identifier."
+                    },
+                    "actions": {
+                        "type": "array",
+                        "description": "Permitted actions for this authorization.",
+                        "items": {
+                            "type": "string",
+                            "enum": ["initiate"]
+                        },
+                        "minItems": 1,
+                        "uniqueItems": true
                     },
                     "instructed_amount": {
                         "type": "object",
-                        "required": ["currency", "amount"]
+                        "description": "Amount and currency of the payment to be initiated.",
+                        "required": ["currency", "amount"],
+                        "properties": {
+                            "currency": {
+                                "type": "string",
+                                "description": "ISO 4217 currency code.",
+                                "pattern": "^[A-Z]{3}$"
+                            },
+                            "amount": {
+                                "type": "string",
+                                "description": "Decimal monetary amount represented as a string.",
+                                "pattern": "^[0-9]+(\\.[0-9]{1,2})?$"
+                            }
+                        },
+                        "additionalProperties": false
                     },
                     "creditor_account": {
                         "type": "object",
-                        "required": ["iban"]
+                        "description": "Account to which the payment will be credited.",
+                        "required": ["iban"],
+                        "properties": {
+                            "iban": {
+                                "type": "string",
+                                "description": "International Bank Account Number (IBAN).",
+                                "pattern": "^[A-Z0-9]{15,34}$"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "remittance_information": {
+                        "type": "string",
+                        "description": "Unstructured remittance information for the payment.",
+                        "maxLength": 140
                     }
                 },
                 "additionalProperties": false

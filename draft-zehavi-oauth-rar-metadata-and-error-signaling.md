@@ -1,6 +1,6 @@
 ---
-title: "OAuth 2.0 Rich Authorization Requests Metadata and Error Signaling"
-abbrev: "OAuth RAR Metadata and Error Signaling"
+title: "OAuth 2.0 RAR Metadata and Error Signaling"
+abbrev: "OAuth 2.0 RAR Metadata and Error Signaling"
 category: std
 
 docname: draft-zehavi-oauth-rar-metadata-and-error-signaling-latest
@@ -28,10 +28,6 @@ author:
     fullname: Yaron Zehavi
     organization: Raiffeisen Bank International
     email: yaron.zehavi@rbinternational.com
- -
-    fullname: Aaron Parecki
-    organization: Okta
-    email: aaron@parecki.com
 
 normative:
   RFC3986:
@@ -166,7 +162,6 @@ The `authorization_details_types_metadata` attribute may be included in:
 
 The `authorization_details_types_metadata` attribute is a JSON object whose keys are authorization details type identifiers. Each value is an object describing a single authorization details type.
 
-    ```json
     {
     "authorization_details_types_metadata": {
         "type": {
@@ -204,7 +199,6 @@ The `authorization_details_types_metadata` attribute is a JSON object whose keys
 
 ### Example Authorization Detail Type Metadata: Payment Initiation
 
-    ```json
     {
         "authorization_details_types_supported": ["payment_initiation"],
         "authorization_details_types_metadata": {
@@ -250,13 +244,46 @@ The error MUST be conveyed using the `WWW-Authenticate` header and MUST include 
 The parameter MUST contain a JSON object or array, representing the required authorization details, whose inclusion in a subsequent OAuth request is required to satisfy the resource server's requirements for this specific request.
 The value MUST be base64url-encoded.
 
-    ```http
+    HTTP/1.1 403 Forbidden
     WWW-Authenticate: Bearer error="insufficient_authorization_details",
     authorization_details="{JSON or base64url-encoded JSON of required RAR}"
+
+# Processing Rules
+
+## Client Processing Rules
+
+* Fetch authorization_details_types_metadata from the authorization or resource server's metadata endpoints.
+* Locate schema or retrieve schema_uri.
+* Construct authorization details conforming to the schema.
+* If resource server returns error insufficient_authorization_details, use provided authorization_details in subsequent OAuth request, then provide the obtained token to resource server.
+
+## Authorization Server Processing Rules
+
+* Advertise authorization_details_types_metadata in metadata.
+* Validate each authorization detail against schema.
+* Enforce additional semantic checks.
+* Reject missing or invalid details with standard OAuth error semantics.
+
+## Resource Server Processing Rules
+
+* Advertise authorization_details_types_metadata.
+* Verify tokens against required authorization details.
+* If insufficient, return HTTP 403 with WWW-Authenticate: Bearer error="insufficient_authorization_details".
+* Do not reveal additional sensitive information.
 
 # Security Considerations {#security-considerations}
 
 # IANA Considerations
+
+## OAuth 2.0 Bearer Token Error Registry
+
+| Error Code | Description |
+|------------|-------------|
+| insufficient_authorization_details | The request is missing required authorization details or the provided authorization details are insufficient. The RS MAY include `authorization_details` describing required details. |
+
+## OAuth Metadata Attribute Registration
+
+The metadata attribute `authorization_details_types_metadata` is defined for OAuth authorization and resource server metadata, as a JSON object mapping authorization details types to documentation, schema, and examples.
 
 ## OAuth Parameters Registration
 

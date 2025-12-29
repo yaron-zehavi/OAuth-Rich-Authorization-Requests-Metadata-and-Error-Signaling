@@ -4,12 +4,11 @@
 
 Web Authorization Protocol                                     Y. Zehavi
 Internet-Draft                             Raiffeisen Bank International
-Intended status: Standards Track                              A. Parecki
-Expires: 2 July 2026                                                Okta
-                                                        29 December 2025
+Intended status: Standards Track                        29 December 2025
+Expires: 2 July 2026
 
 
-   OAuth 2.0 Rich Authorization Requests Metadata and Error Signaling
+               OAuth 2.0 RAR Metadata and Error Signaling
        draft-zehavi-oauth-rar-metadata-and-error-signaling-latest
 
 Abstract
@@ -100,14 +99,20 @@ Table of Contents
      5.1.  Overview
      5.2.  Error Definition
      5.3.  authorization_details Error Parameter
-   6.  Security Considerations
-   7.  IANA Considerations
-     7.1.  OAuth Parameters Registration
-   8.  Normative References
+   6.  Processing Rules
+     6.1.  Client Processing Rules
+     6.2.  Authorization Server Processing Rules
+     6.3.  Resource Server Processing Rules
+   7.  Security Considerations
+   8.  IANA Considerations
+     8.1.  OAuth 2.0 Bearer Token Error Registry
+     8.2.  OAuth Metadata Attribute Registration
+     8.3.  OAuth Parameters Registration
+   9.  Normative References
    Appendix A.  Example User Experiences
    Appendix B.  Document History
    Acknowledgments
-   Authors' Addresses
+   Author's Address
 
 1.  Introduction
 
@@ -263,7 +268,6 @@ Table of Contents
    whose keys are authorization details type identifiers.  Each value is
    an object describing a single authorization details type.
 
-   ```json
    {
    "authorization_details_types_metadata": {
        "type": {
@@ -312,7 +316,6 @@ Table of Contents
 
 4.5.1.  Example Authorization Detail Type Metadata: Payment Initiation
 
-```json
 {
     "authorization_details_types_supported": ["payment_initiation"],
     "authorization_details_types_metadata": {
@@ -364,15 +367,78 @@ Table of Contents
    request is required to satisfy the resource server's requirements for
    this specific request.  The value MUST be base64url-encoded.
 
-```http
+HTTP/1.1 403 Forbidden
 WWW-Authenticate: Bearer error="insufficient_authorization_details",
 authorization_details="{JSON or base64url-encoded JSON of required RAR}"
 
-6.  Security Considerations
+6.  Processing Rules
 
-7.  IANA Considerations
+6.1.  Client Processing Rules
 
-7.1.  OAuth Parameters Registration
+   *  Fetch authorization_details_types_metadata from the authorization
+      or resource server's metadata endpoints.
+
+   *  Locate schema or retrieve schema_uri.
+
+   *  Construct authorization details conforming to the schema.
+
+   *  If resource server returns error
+      insufficient_authorization_details, use provided
+      authorization_details in subsequent OAuth request, then provide
+      the obtained token to resource server.
+
+6.2.  Authorization Server Processing Rules
+
+   *  Advertise authorization_details_types_metadata in metadata.
+
+   *  Validate each authorization detail against schema.
+
+   *  Enforce additional semantic checks.
+
+   *  Reject missing or invalid details with standard OAuth error
+      semantics.
+
+6.3.  Resource Server Processing Rules
+
+   *  Advertise authorization_details_types_metadata.
+
+   *  Verify tokens against required authorization details.
+
+   *  If insufficient, return HTTP 403 with WWW-Authenticate: Bearer
+      error="insufficient_authorization_details".
+
+   *  Do not reveal additional sensitive information.
+
+7.  Security Considerations
+
+8.  IANA Considerations
+
+8.1.  OAuth 2.0 Bearer Token Error Registry
+
+   +====================================+==============================+
+   | Error Code                         | Description                  |
+   +====================================+==============================+
+   | insufficient_authorization_details | The request is missing       |
+   |                                    | required authorization       |
+   |                                    | details or the provided      |
+   |                                    | authorization details        |
+   |                                    | are insufficient.  The       |
+   |                                    | RS MAY include               |
+   |                                    | authorization_details        |
+   |                                    | describing required          |
+   |                                    | details.                     |
+   +------------------------------------+------------------------------+
+
+                                  Table 1
+
+8.2.  OAuth Metadata Attribute Registration
+
+   The metadata attribute authorization_details_types_metadata is
+   defined for OAuth authorization and resource server metadata, as a
+   JSON object mapping authorization details types to documentation,
+   schema, and examples.
+
+8.3.  OAuth Parameters Registration
 
    IANA has (TBD) registered the following values in the IANA "OAuth
    Parameters" registry of [IANA.oauth-parameters] established by
@@ -386,7 +452,7 @@ authorization_details="{JSON or base64url-encoded JSON of required RAR}"
 
    *Specification Document*: Section 5.4 of this specification
 
-8.  Normative References
+9.  Normative References
 
    [IANA.oauth-parameters]
               IANA, "OAuth Parameters",
@@ -444,13 +510,8 @@ Appendix B.  Document History
 
 Acknowledgments
 
-Authors' Addresses
+Author's Address
 
    Yaron Zehavi
    Raiffeisen Bank International
    Email: yaron.zehavi@rbinternational.com
-
-
-   Aaron Parecki
-   Okta
-   Email: aaron@parecki.com

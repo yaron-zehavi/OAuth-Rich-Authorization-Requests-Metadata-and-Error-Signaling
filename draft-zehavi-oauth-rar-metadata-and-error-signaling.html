@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>OAuth 2.0 Rich Authorization Requests Metadata and Error Signaling</title>
+<title>OAuth 2.0 RAR Metadata and Error Signaling</title>
 <meta content="Yaron Zehavi" name="author">
-<meta content="Aaron Parecki" name="author">
 <meta content="
        OAuth 2.0 Rich Authorization Requests (RAR), as defined in  , enables clients to request fine-grained authorization using structured JSON objects. While RAR   standardizes the exchange and handling of authorization details, it does not define a mechanism for clients to discover how to construct valid authorization details types. 
        This document defines a machine-readable metadata structure for advertising authorization details type documentation and JSON Schema   definitions via OAuth Authorization Server Metadata   and OAuth Resource Server Metadata  . In addition, this document defines a new OAuth error code,  insufficient_authorization_details , enabling resource servers to return actionable authorization details information to clients. 
@@ -1046,11 +1045,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <table class="ears">
 <thead><tr>
 <td class="left">Internet-Draft</td>
-<td class="center">OAuth RAR Metadata and Error Signaling</td>
+<td class="center">OAuth 2.0 RAR Metadata and Error Signali</td>
 <td class="right">December 2025</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Zehavi &amp; Parecki</td>
+<td class="left">Zehavi</td>
 <td class="center">Expires 2 July 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
@@ -1070,20 +1069,16 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
 <dd class="expires"><time datetime="2026-07-02">2 July 2026</time></dd>
-<dt class="label-authors">Authors:</dt>
+<dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
       <div class="author-name">Y. Zehavi</div>
 <div class="org">Raiffeisen Bank International</div>
 </div>
-<div class="author">
-      <div class="author-name">A. Parecki</div>
-<div class="org">Okta</div>
-</div>
 </dd>
 </dl>
 </div>
-<h1 id="title">OAuth 2.0 Rich Authorization Requests Metadata and Error Signaling</h1>
+<h1 id="title">OAuth 2.0 RAR Metadata and Error Signaling</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">OAuth 2.0 Rich Authorization Requests (RAR), as defined in <span>[<a href="#RFC9396" class="cite xref">RFC9396</a>]</span>, enables clients to request fine-grained authorization using structured JSON objects. While RAR <span>[<a href="#RFC9396" class="cite xref">RFC9396</a>]</span> standardizes the exchange and handling of authorization details, it does not define a mechanism for clients to discover how to construct valid authorization details types.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
@@ -1210,30 +1205,50 @@ svg :is([fill="white"], [fill^="#fff"]) {
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-processing-rules" class="internal xref">Processing Rules</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-oauth-parameters-registrati" class="internal xref">OAuth Parameters Registration</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-client-processing-rules" class="internal xref">Client Processing Rules</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-authorization-server-proces" class="internal xref">Authorization Server Processing Rules</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-resource-server-processing-" class="internal xref">Resource Server Processing Rules</a></p>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-oauth-20-bearer-token-error" class="internal xref">OAuth 2.0 Bearer Token Error Registry</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-oauth-metadata-attribute-re" class="internal xref">OAuth Metadata Attribute Registration</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-oauth-parameters-registrati" class="internal xref">OAuth Parameters Registration</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-example-user-experiences" class="internal xref">Example User Experiences</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-document-history" class="internal xref">Document History</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-example-user-experiences" class="internal xref">Example User Experiences</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-document-history" class="internal xref">Document History</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1400,7 +1415,6 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-4.3-1">The <code>authorization_details_types_metadata</code> attribute is a JSON object whose keys are authorization details type identifiers. Each value is an object describing a single authorization details type.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-4.3-2">
 <pre>
-```json
 {
 "authorization_details_types_metadata": {
     "type": {
@@ -1468,7 +1482,6 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
           </h4>
 <div class="alignLeft art-text artwork" id="section-4.5.1-1">
 <pre>
-```json
 {
     "authorization_details_types_supported": ["payment_initiation"],
     "authorization_details_types_metadata": {
@@ -1536,7 +1549,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 The value <span class="bcp14">MUST</span> be base64url-encoded.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5.3-2">
 <pre>
-```http
+HTTP/1.1 403 Forbidden
 WWW-Authenticate: Bearer error="insufficient_authorization_details",
 authorization_details="{JSON or base64url-encoded JSON of required RAR}"
 </pre><a href="#section-5.3-2" class="pilcrow">¶</a>
@@ -1545,36 +1558,136 @@ authorization_details="{JSON or base64url-encoded JSON of required RAR}"
 </div>
 </section>
 </div>
-<div id="security-considerations">
+<div id="processing-rules">
 <section id="section-6">
+      <h2 id="name-processing-rules">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-processing-rules" class="section-name selfRef">Processing Rules</a>
+      </h2>
+<div id="client-processing-rules">
+<section id="section-6.1">
+        <h3 id="name-client-processing-rules">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-client-processing-rules" class="section-name selfRef">Client Processing Rules</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="section-6.1-1.1">
+            <p id="section-6.1-1.1.1">Fetch authorization_details_types_metadata from the authorization or resource server's metadata endpoints.<a href="#section-6.1-1.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.1-1.2">
+            <p id="section-6.1-1.2.1">Locate schema or retrieve schema_uri.<a href="#section-6.1-1.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.1-1.3">
+            <p id="section-6.1-1.3.1">Construct authorization details conforming to the schema.<a href="#section-6.1-1.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.1-1.4">
+            <p id="section-6.1-1.4.1">If resource server returns error insufficient_authorization_details, use provided authorization_details in subsequent OAuth request, then provide the obtained token to resource server.<a href="#section-6.1-1.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="authorization-server-processing-rules">
+<section id="section-6.2">
+        <h3 id="name-authorization-server-proces">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-authorization-server-proces" class="section-name selfRef">Authorization Server Processing Rules</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="section-6.2-1.1">
+            <p id="section-6.2-1.1.1">Advertise authorization_details_types_metadata in metadata.<a href="#section-6.2-1.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-1.2">
+            <p id="section-6.2-1.2.1">Validate each authorization detail against schema.<a href="#section-6.2-1.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-1.3">
+            <p id="section-6.2-1.3.1">Enforce additional semantic checks.<a href="#section-6.2-1.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-1.4">
+            <p id="section-6.2-1.4.1">Reject missing or invalid details with standard OAuth error semantics.<a href="#section-6.2-1.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="resource-server-processing-rules">
+<section id="section-6.3">
+        <h3 id="name-resource-server-processing-">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-resource-server-processing-" class="section-name selfRef">Resource Server Processing Rules</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="section-6.3-1.1">
+            <p id="section-6.3-1.1.1">Advertise authorization_details_types_metadata.<a href="#section-6.3-1.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.3-1.2">
+            <p id="section-6.3-1.2.1">Verify tokens against required authorization details.<a href="#section-6.3-1.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.3-1.3">
+            <p id="section-6.3-1.3.1">If insufficient, return HTTP 403 with WWW-Authenticate: Bearer error="insufficient_authorization_details".<a href="#section-6.3-1.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.3-1.4">
+            <p id="section-6.3-1.4.1">Do not reveal additional sensitive information.<a href="#section-6.3-1.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-7">
       <h2 id="name-security-considerations">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
     </h2>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-7">
+<section id="section-8">
       <h2 id="name-iana-considerations">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<div id="oauth-parameters-registration">
-<section id="section-7.1">
-        <h3 id="name-oauth-parameters-registrati">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-oauth-parameters-registrati" class="section-name selfRef">OAuth Parameters Registration</a>
+<div id="oauth-20-bearer-token-error-registry">
+<section id="section-8.1">
+        <h3 id="name-oauth-20-bearer-token-error">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-oauth-20-bearer-token-error" class="section-name selfRef">OAuth 2.0 Bearer Token Error Registry</a>
         </h3>
-<p id="section-7.1-1">IANA has (TBD) registered the following values in the IANA "OAuth Parameters" registry of <span>[<a href="#IANA.oauth-parameters" class="cite xref">IANA.oauth-parameters</a>]</span> established by <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
-<p id="section-7.1-2"><strong>Parameter name</strong>: <code>native_callback_uri</code><a href="#section-7.1-2" class="pilcrow">¶</a></p>
-<p id="section-7.1-3"><strong>Parameter usage location</strong>: Native Authorization Endpoint<a href="#section-7.1-3" class="pilcrow">¶</a></p>
-<p id="section-7.1-4"><strong>Change Controller</strong>: IETF<a href="#section-7.1-4" class="pilcrow">¶</a></p>
-<p id="section-7.1-5"><strong>Specification Document</strong>: Section 5.4 of this specification<a href="#section-7.1-5" class="pilcrow">¶</a></p>
+<table class="center" id="table-1">
+          <caption><a href="#table-1" class="selfRef">Table 1</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Error Code</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">insufficient_authorization_details</td>
+              <td class="text-left" rowspan="1" colspan="1">The request is missing required authorization details or the provided authorization details are insufficient. The RS <span class="bcp14">MAY</span> include <code>authorization_details</code> describing required details.</td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
+<div id="oauth-metadata-attribute-registration">
+<section id="section-8.2">
+        <h3 id="name-oauth-metadata-attribute-re">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-oauth-metadata-attribute-re" class="section-name selfRef">OAuth Metadata Attribute Registration</a>
+        </h3>
+<p id="section-8.2-1">The metadata attribute <code>authorization_details_types_metadata</code> is defined for OAuth authorization and resource server metadata, as a JSON object mapping authorization details types to documentation, schema, and examples.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="oauth-parameters-registration">
+<section id="section-8.3">
+        <h3 id="name-oauth-parameters-registrati">
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-oauth-parameters-registrati" class="section-name selfRef">OAuth Parameters Registration</a>
+        </h3>
+<p id="section-8.3-1">IANA has (TBD) registered the following values in the IANA "OAuth Parameters" registry of <span>[<a href="#IANA.oauth-parameters" class="cite xref">IANA.oauth-parameters</a>]</span> established by <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+<p id="section-8.3-2"><strong>Parameter name</strong>: <code>native_callback_uri</code><a href="#section-8.3-2" class="pilcrow">¶</a></p>
+<p id="section-8.3-3"><strong>Parameter usage location</strong>: Native Authorization Endpoint<a href="#section-8.3-3" class="pilcrow">¶</a></p>
+<p id="section-8.3-4"><strong>Change Controller</strong>: IETF<a href="#section-8.3-4" class="pilcrow">¶</a></p>
+<p id="section-8.3-5"><strong>Specification Document</strong>: Section 5.4 of this specification<a href="#section-8.3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="sec-normative-references">
-<section id="section-8">
+<section id="section-9">
       <h2 id="name-normative-references">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
       </h2>
 <dl class="references">
 <dt id="IANA.oauth-parameters">[IANA.oauth-parameters]</dt>
@@ -1646,8 +1759,8 @@ authorization_details="{JSON or base64url-encoded JSON of required RAR}"
 </div>
 <div id="authors-addresses">
 <section id="appendix-D">
-      <h2 id="name-authors-addresses">
-<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
       </h2>
 <address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Yaron Zehavi</span></div>
@@ -1655,14 +1768,6 @@ authorization_details="{JSON or base64url-encoded JSON of required RAR}"
 <div class="email">
 <span>Email:</span>
 <a href="mailto:yaron.zehavi@rbinternational.com" class="email">yaron.zehavi@rbinternational.com</a>
-</div>
-</address>
-<address class="vcard">
-        <div dir="auto" class="left"><span class="fn nameRole">Aaron Parecki</span></div>
-<div dir="auto" class="left"><span class="org">Okta</span></div>
-<div class="email">
-<span>Email:</span>
-<a href="mailto:aaron@parecki.com" class="email">aaron@parecki.com</a>
 </div>
 </address>
 </section>

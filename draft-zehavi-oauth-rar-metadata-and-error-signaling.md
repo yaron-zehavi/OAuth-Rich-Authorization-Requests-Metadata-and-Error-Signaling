@@ -39,12 +39,21 @@ normative:
   RFC9396:
   RFC9728:
   IANA.oauth-parameters:
+  JSON.Schema:
+    title: JSON Schema: A Media Type for Describing JSON Documents
+    target: https://json-schema.org/draft/2020-12/json-schema-core
+    date: June 16, 2022
+    author:
+      - ins: A. Wright, Ed.
+      - ins: H. Andrews, Ed.
+      - ins: B. Hutton, Ed. Postman
+      - ins: G. Dennis
 
 --- abstract
 
-OAuth 2.0 Rich Authorization Requests (RAR), as defined in {{RFC9396}}, enables clients to request fine-grained authorization using structured JSON objects. While RAR {{RFC9396}} standardizes the exchange and handling of authorization details, it does not define a mechanism for clients to discover how to construct valid authorization detail types.
+OAuth 2.0 Rich Authorization Requests (RAR), as defined in {{RFC9396}}, enables clients to request fine-grained authorization using structured JSON objects. While RAR {{RFC9396}} standardizes the exchange and handling of authorization details, it does not define a mechanism for clients to discover how to construct valid authorization details types.
 
-This document defines a machine-readable metadata structure for advertising authorization detail type documentation and JSON Schema definitions via OAuth Authorization Server Metadata {{RFC8414}} and OAuth Resource Server Metadata {{RFC9728}}. In addition, this document defines a new OAuth error code, `insufficient_authorization_details`, enabling resource servers to return actionable authorization detail information to clients.
+This document defines a machine-readable metadata structure for advertising authorization details type documentation and JSON Schema {{JSON.Schema}} definitions via OAuth Authorization Server Metadata {{RFC8414}} and OAuth Resource Server Metadata {{RFC9728}}. In addition, this document defines a new OAuth error code, `insufficient_authorization_details`, enabling resource servers to return actionable authorization details information to clients.
 
 --- middle
 
@@ -58,7 +67,7 @@ As a result, clients must rely on out-of-band documentation or static ecosystem 
 
 This document addresses this gap by defining:
 
-* A metadata structure for authorization detail types, containing both human-readable documentation as well as embedded JSON Schema definitions.
+* A metadata structure for authorization details types, containing both human-readable documentation as well as embedded JSON Schema {{JSON.Schema}} definitions.
 * Discovery through Authorization Server Metadata {{RFC8414}}, as well as via OAuth 2.0 Protected Resource Metadata {{RFC9728}}.
 * A standardized error signaling mechanism allowing resource servers to return an authorization details object, to be included in a new Auth request, in order to accomplish a specific request.
 
@@ -72,13 +81,12 @@ Alternatively they may decide clients do not need to learn to construct valid au
 
 # Protocol Overview
 
-There are three primary ways this specification extends FiPA:
+There are two main proposed flows, which may be combined:
 
-* `federate` response: Sends the client to interact with a downstream authorization server.
-* `insufficient_information` response: Instructs the client to collect information from end-user required to decide where to federate to. For example this could be an email address which identifies the trust domain.
-* `redirect_to_app`: Instructs the client to natively invoke an app to interact with end user.
+* Client learns to construct valid authorization details objects from authorization details types metadata provided by authorization servers, resource servers or both.
+* Resource servers provide clients as part of an error response, the precise authorization details object, whose inclusion in subsequent OAuth requests is required to accomplish a specific request.
 
-## Representative flow: Native client federated and redirected to app
+## Client obtains authorization details types metadata
 
 ~~~ ascii-art
                                                 +--------------------+
@@ -142,300 +150,116 @@ Figure: Native client federated, then redirected to app
 - (J) The client sends the authorization code received in step (I) to obtain a token from the Token Endpoint.
 - (K) Authorization Server 1 returns an Access Token from the Token Endpoint.
 
-# Protocol Endpoints
+## Client obtains authorization details object
 
-## Native Authorization Endpoint {#native-authorization-endpoint}
+Here comes another drawing.
 
-The native authorization endpoint defined by is used by this document.
+# Authorization Details Type Metadata
 
-This document adds the *native_callback_uri* parameter to the native authorization endpoint, to support
-cross-app native user navigation.
+## Overview
 
-Before authorization servers instruct a client to federate to a downstream authorization server, they MUST ensure it offers a *native_authorization_endpoint*, otherwise return the error native_authorization_federate_unsupported*.
+This document defines a new metadata attribute, `authorization_details_types_metadata`, which provides documentation and validation information for authorization details types used with Rich Authorization Requests {{RFC9396}}.
 
-When federating to downstream authorization servers, the usage of PAR with client authentication is REQUIRED, as the native client calling the Native Authorization Endpoint of a federated authorization server is not *its* OAuth client and therefore has no other means of authenticating.
-When using PAR with client authentication, the request_uri provided to the Native Authorization Endpoint attests that client authentication took place.
+The metadata MAY be published by OAuth Authorization Servers using Authorization Server Metadata {{RFC9126}} as well as by OAuth Resource Servers using Resource Server Metadata {{RFC9728}}.
 
-## Native Authorization Request {#native-auth-request}
+Clients MAY use this metadata to dynamically construct valid `authorization_details` objects.
 
-The native authorization endpoint is called as defined by FiPA .
-This document adds the following request parameter:
+## Metadata Location
 
-"native_callback_uri":
-: OPTIONAL. Native client app's **redirect_uri**, claimed as deep link. *native_callback_uri* SHALL be natively invoked by authorization server's user-interacting app to provide its response to the client app. If native_callback_uri is included in a native authorization request, authorization server MUST include the native_callback_uri when federating to another authorization server.
+The `authorization_details_types_metadata` attribute may be included in:
 
-## Native Authorization Response {#native-response}
+* Authorization Server Metadata {{RFC8414}}, to describe authorization details types supported by the authorization server. If present, its keys MUST be a subset of the values listed in `authorization_details_types_supported` as defined in {{RFC9396}}.
+* OAuth 2.0 Protected Resource Metadata {{RFC9728}}, to describe authorization details types accepted by the protecred resource.
 
-This document extends FiPA's  error response,
-by adding the following error codes:
+## Metadata Structure
 
-"error":
-:    REQUIRED.  A single ASCII error code from the following:
+The `authorization_details_types_metadata` attribute is a JSON object whose keys are authorization details type identifiers. Each value is an object describing a single authorization details type.
 
-     "insufficient_information":
-     :     the Authorization Server requires additional user input,
-           other than an authentication challenge, to determine the
-           target authorization server to federate to.
-           See {{insufficient-information}} for details.
-
-     "federate":
-     :     The Authorization Server wishes to federate to another
-           authorization server, which it is a client of. This
-           response MUST include the *federation_uri* response parameter.
-           See {{federating-response}} for details.
-
-     "redirect_to_app":
-     :     The Authorization Server wishes to fulfill the user interaction
-           using another native app. This response MUST include the
-           *federation_uri* response parameter.
-           See {{redirect-to-app-response}} for details.
-
-     "native_authorization_federate_unsupported":
-     :     The authorization server intended to federate to
-           a downstream authorization server, but it does not
-           support the native authorization endpoint.
-
-And adds the following response attributes:
-
-"federation_uri":
-:    OPTIONAL.  The Native Authorization Endpoint of a downstream
-     authorization server to federate to.
-
-"deep_link":
-:    OPTIONAL.  A URI of native app to be invoked to handle the request.
-
-"federation_body":
-:    OPTIONAL.  A string of application/x-www-form-urlencoded
-     request parameters according to this specification for the
-     downstream authorization server's Native Authorization Endpoint.
-
-"response_uri":
-:    OPTIONAL.  A URI of an endpoint of federating authorization server
-     which shall receive the response from the federated authorization server.
-
-### Federating Response {#federating-response}
-
-If the authorization server decides to federate to another authorization server, it
-responds with error code *federate* and MUST return the *federation_uri*,
-*federation_body*, *response_uri* and *auth_session* response attributes.
-
-When federating to another authorization server:
-* Federating authorization server MUST use PAR and include *request_uri* in federation_body.
-* If *native_callback_uri* was included in the native authorization request, it MUST be included when calling federated authorization server's Native Authorization Endpoint.
-
-Example **federating** response:
-
-    HTTP/1.1 400 Bad Request
-    Content-Type: application/json
-
-    {
-        "error": "federate",
-        "auth_session": "ce6772f5e07bc8361572f",
-        "response_uri": "https://prev-as.com/native-authorization",
-        "federation_uri": "https://next-as.com/native-authorization",
-        "federation_body": "client_id=s6BhdRkqt3&request_uri=
-          urn:ietf:params:oauth:request_uri:R3p_hzwsR7outNQSKfoX"
+```json
+{
+  "authorization_details_types_metadata": {
+    "<type>": {
+      "version": "...",
+      "description": "...",
+      "documentation_uri": "...",
+      "schema": { },
+      "schema_uri": "...",
+      "examples": [ ]
     }
+  }
+}
 
-Client MUST call the *federation_uri* using HTTP POST, and provide it *federation_body*
-as application/x-www-form-urlencoded request body. Example:
+## Metadata Attributes
 
-    POST /native-authorization HTTP/1.1
-    Host: next-as.com
-    Content-Type: application/x-www-form-urlencoded
+"version":
+: OPTIONAL. String identifying the version of the authorization details type definition. The value is informational and does not imply semantic version negotiation.
 
-    client_id=s6BhdRkqt3&request_uri=
-    urn:ietf:params:oauth:request_uri:R3p_hzwsR7outNQSKfoX
+"description":
+: OPTIONAL. String containing a human-readable description of the authorization details type. Clients MUST NOT rely on this value for authorization or validation decisions.
 
-The client MUST provide any response obtained from the **federated** authorization server,
-as application/x-www-form-urlencoded request body for the *response_uri* of the respective
-**federating** authorization server which SHALL be invoked using HTTP POST.
+"documentation_uri":
+: OPTIONAL. URI referencing external human-readable documentation describing the authorization details type.
 
-However, when **federated** authorization server returns the following error codes:
-*federate*, *insufficient_authorization*, *insufficient_information*, *redirect_to_app*,
-*redirect_to_web*, client MUST handle these errors according to and this specification.
+"schema":
+: The `schema` attribute is a JSON Schema document {{JSON.Schema}} describing a single authorization detail object. The schema MUST validate a single authorization detail object and MUST constrain the `type` attribute to the authorization detail type identifier. This attribute is REQUIRED unless `schema_uri` is specified. If this attribute is present, `schema_uri` MUST NOT be present.
 
-Example client calling receiving an authorization code response from the federated
-authorization server:
+"schema_uri":
+: The `schema_uri` attribute is an absolute URI, as defined by RFC 3986 {{RFC3986}}, referencing a JSON Schema document describing a single authorization details object. The referenced schema MUST satisfy the same requirements as the `schema` attribute. This attribute is REQUIRED unless `schema` is specified. If this attribute is present, `schema` MUST NOT be present.
 
-    HTTP/1.1 200 OK
-    Server: next-as.com
-    Content-Type: application/json
-    Cache-Control: no-store
+"examples":
+: OPTIONAL. An array of example authorization details objects. Examples are non-normative.
 
-    {
-      "authorization_code": "uY29tL2F1dGhlbnRpY"
+## Metadata Examples
+
+### Example Authorization Detail Type Metadata: Payment Initiation
+
+```json
+{
+  "authorization_details_types_supported": ["payment_initiation"],
+  "authorization_details_types_metadata": {
+    "payment_initiation": {
+      "version": "1.0",
+      "description": "Authorization to initiate a single payment.",
+      "documentation_uri": "https://example.com/docs/payment-initiation",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "required": ["type", "instructed_amount", "creditor_account"],
+        "properties": {
+          "type": { "const": "payment_initiation" },
+          "instructed_amount": {
+            "type": "object",
+            "required": ["currency", "amount"]
+          },
+          "creditor_account": {
+            "type": "object",
+            "required": ["iban"]
+          }
+        },
+        "additionalProperties": false
+      }
     }
+  }
+}
 
-And providing it to the federating authorization server's response_uri,
-adding previously obtained auth_session:
+# Resource Server Error Signaling with insufficient_authorization_details
 
-    POST /native-authorization HTTP/1.1
-    Host: prev-as.com
-    Content-Type: application/x-www-form-urlencoded
+## Overview
 
-    authorization_code=uY29tL2F1dGhlbnRpY
-    &auth_session=ce6772f5e07bc8361572f
+This document defines a new OAuth error code, `insufficient_authorization_details`, for use when access is denied due to missing or insufficient authorization details.
 
-### Redirect to app response {#redirect-to-app-response}
+## Error Definition
 
-If the authorization server decides to use a native app to interact with
-end user, it responds with error code *redirect_to_app* and MUST return the
-*deep_link* response attribute.
+The error MUST be conveyed using the `WWW-Authenticate` header and MUST include an `authorization_details` parameter.
 
-Example **redirect_to_app** response:
+## authorization_details Error Parameter
 
-    HTTP/1.1 400 Bad Request
-    Content-Type: application/json
+The parameter MUST contain a JSON object or array, representing the required authorization details, whose inclusion in a subsequent OAuth request is required to satisfy the resource server's requirements for this specific request.
+The value MUST be base64url-encoded.
 
-    {
-        "error": "redirect_to_app",
-        "deep_link": "https://next-as.com/native-authorization?
-          client_id=s6BhdRkqt3&request_uri=
-          urn:ietf:params:oauth:request_uri:R3p_hzwsR7outNQSKfoX"
-    }
-
-Client MUST use OS mechanisms to invoke the obtained deep_link.
-If no app claiming deep_link is found on the device, client MUST terminate the
-flow and MAY attempt a normal non-native OAuth flow.
-
-The invoked app handles the native authorization request:
-
-* Validates the request and ensures it contains a *native_callback_uri*, Otherwise terminates the flow.
-* Establishes trust in *native_callback_uri* and validates that an app claiming it is on the device. Otherwise terminates the flow.
-* Authenticates end-user and authorizes the request.
-* Uses OS mechanisms to natively invoke *native_callback_uri* and return to the client, providing it a response according to this specification's response from a Native Authorization Endpoint, as url-encoded query parameters.
-
-Note - trust establishment mechanisms in *native_callback_uri* are out of scope of this specification.
-However we assume closed ecosystems could employ an allowList, and open ecosystems could leverage:
-
-  * Extract native_callback_uri's DNS domain.
-  * Add the path /.well-known/openid-federation and perform trust chain resolution.
-  * Inspect client's metadata for redirect_uri's and validate **native_callback_uri** is included among them.
-
-When the client is invoked on its native_callback_uri, it shall regard the invocation as a
-response **from** the authorization server which redirected the client to the app.
-In other words, this response's audience is not the authorization server which redirected
-the client to the app. See {{federating-response}} for details.
-
-Example URI used to invoke of client app on its claimed native_callback_uri:
-
-    https://client.example.com/cb?authorization_code=uY29tL2F1dGhlbnRpY
-
-Example client invoking the response_uri **of the authorization server which federated it**
-to the authorization server, which redirected it to the app:
-
-    POST /native-authorization HTTP/1.1
-    Host: **prev-as.com**
-    Content-Type: application/x-www-form-urlencoded
-
-    authorization_code=uY29tL2F1dGhlbnRpY
-    &auth_session=ce6772f5e07bc8361572f
-
-### Additional Information Required Response {#insufficient-information}
-
-If additional user input is required, for example to determine where to federate to,
-the response body shall contain the following additional properties:
-
-logo:
-: OPTIONAL. URL or base64-encoded logo of *Authorization Server*, for branding purposes.
-
-userPrompt:
-: REQUIRED. A JSON object containing the prompt definition. The following parameters MAY be used:
-
-- options: OPTIONAL. A JSON object that defines a dropdown/select input with various options to choose from. Each key is the parameter name to be sent in the response and each value defines the option:
-
-  - title: OPTIONAL. A string holding the input's title.
-  - description: OPTIONAL. A string holding the input's description.
-  - values: REQUIRED. A JSON object where each key is the selection value and each value holds display data for that value:
-
-    - name: REQUIRED. A string holding the display name of the selection value.
-    - logo: OPTIONAL. A string holding a URL or base64-encoded image for that selection value.
-- inputs: OPTIONAL. A JSON object that defines an input field. Each key is the parameter name to be sent in the response and each value defines the input field:
-
-  - title: OPTIONAL. A string holding the input's title.
-  - hint: OPTIONAL. A string holding the input's hint that is displayed if the input is empty.
-  - description: OPTIONAL. A string holding the input's description.
-
-Example of requesting end-user for 2 multiple-choice inputs:
-
-    HTTP/1.1 400 Bad Request
-    Content-Type: application/json
-
-    {
-        "error": "insufficient_information",
-        "auth_session": "ce6772f5e07bc8361572f",
-        "logo": "uri or base64-encoded logo of Authorization Server",
-        "userPrompt": {
-            "options": {
-                "bank": {
-                    "title": "Bank",
-                    "description": "Choose your Bank",
-                    "values": {
-                        "bankOfSomething": {
-                            "name": "Bank of Something",
-                            "logo": "uri or base64-encoded logo"
-                        },
-                        "firstBankOfCountry": {
-                            "name": "First Bank of Country",
-                            "logo": "uri or base64-encoded logo"
-                        }
-                    }
-                },
-                "segment": {
-                    "title": "Customer Segment",
-                    "description": "Choose your Customer Segment",
-                    "values": {
-                        "retail": "Retail",
-                        "smb": "Small & Medium Businesses",
-                        "corporate": "Corporate",
-                        "ic": "Institutional Clients"
-                    }
-                }
-            }
-        }
-    }
-
-Example of requesting end-user for text input entry (email):
-
-    HTTP/1.1 400 Bad Request
-    Content-Type: application/json
-
-    {
-        "error": "insufficient_information",
-        "auth_session": "ce6772f5e07bc8361572f",
-        "action": "prompt",
-        "id": "request-identifier-2",
-        "logo": "uri or base64-encoded logo of Authorization Server",
-        "userPrompt": {
-            "inputs": {
-                "email": {
-                    "hint": "Enter your email address",
-                    "title": "E-Mail",
-                    "description": "Lorem Ipsum"
-                }
-            }
-        }
-    }
-
-The client gathers the required additional information and makes a POST request to the Native Authorization Endpoint. Example of response following end-user multiple-choice:
-
-    POST /native-authorization HTTP/1.1
-    Host: example.as.com
-    Content-Type: application/x-www-form-urlencoded
-
-    auth_session=ce6772f5e07bc8361572f
-    &bank=bankOfSomething
-    &segment=retail
-
-Example of *Client App* response following end-user input entry:
-
-    POST /native-authorization HTTP/1.1
-    Host: example.as.com
-    Content-Type: application/x-www-form-urlencoded
-
-    auth_session=ce6772f5e07bc8361572f
-    &email=end_user@example.as.com
+```http
+WWW-Authenticate: Bearer error="insufficient_authorization_details",
+ authorization_details="{JSON or base64url-encoded JSON of required RAR}"
 
 # Security Considerations {#security-considerations}
 

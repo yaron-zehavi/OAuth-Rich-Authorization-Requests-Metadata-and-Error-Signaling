@@ -204,34 +204,34 @@ The `authorization_details_types_metadata` attribute is a JSON object whose keys
 
 ### Example Authorization Detail Type Metadata: Payment Initiation
 
-```json
-{
-  "authorization_details_types_supported": ["payment_initiation"],
-  "authorization_details_types_metadata": {
-    "payment_initiation": {
-      "version": "1.0",
-      "description": "Authorization to initiate a single payment.",
-      "documentation_uri": "https://example.com/docs/payment-initiation",
-      "schema": {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "type": "object",
-        "required": ["type", "instructed_amount", "creditor_account"],
-        "properties": {
-          "type": { "const": "payment_initiation" },
-          "instructed_amount": {
+    ```json
+    {
+    "authorization_details_types_supported": ["payment_initiation"],
+    "authorization_details_types_metadata": {
+        "payment_initiation": {
+        "version": "1.0",
+        "description": "Authorization to initiate a single payment.",
+        "documentation_uri": "https://example.com/docs/payment-initiation",
+        "schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
             "type": "object",
-            "required": ["currency", "amount"]
-          },
-          "creditor_account": {
-            "type": "object",
-            "required": ["iban"]
-          }
-        },
-        "additionalProperties": false
-      }
+            "required": ["type", "instructed_amount", "creditor_account"],
+            "properties": {
+            "type": { "const": "payment_initiation" },
+            "instructed_amount": {
+                "type": "object",
+                "required": ["currency", "amount"]
+            },
+            "creditor_account": {
+                "type": "object",
+                "required": ["iban"]
+            }
+            },
+            "additionalProperties": false
+        }
+        }
     }
-  }
-}
+    }
 
 # Resource Server Error Signaling with insufficient_authorization_details
 
@@ -248,9 +248,9 @@ The error MUST be conveyed using the `WWW-Authenticate` header and MUST include 
 The parameter MUST contain a JSON object or array, representing the required authorization details, whose inclusion in a subsequent OAuth request is required to satisfy the resource server's requirements for this specific request.
 The value MUST be base64url-encoded.
 
-```http
-WWW-Authenticate: Bearer error="insufficient_authorization_details",
- authorization_details="{JSON or base64url-encoded JSON of required RAR}"
+    ```http
+    WWW-Authenticate: Bearer error="insufficient_authorization_details",
+    authorization_details="{JSON or base64url-encoded JSON of required RAR}"
 
 # Security Considerations {#security-considerations}
 

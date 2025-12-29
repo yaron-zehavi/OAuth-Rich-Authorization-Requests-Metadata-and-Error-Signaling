@@ -204,34 +204,6 @@ The `authorization_details_types_metadata` attribute is a JSON object whose keys
 
 ### Example Authorization Detail Type Metadata: Payment Initiation
 
-    {
-    "authorization_details_types_supported": ["payment_initiation"],
-    "authorization_details_types_metadata": {
-        "payment_initiation": {
-        "version": "1.0",
-        "description": "Authorization to initiate a single payment.",
-        "documentation_uri": "https://example.com/docs/payment-initiation",
-        "schema": {
-            "$schema": "https://json-schema.org/draft/2020-12/schema",
-            "type": "object",
-            "required": ["type", "instructed_amount", "creditor_account"],
-            "properties": {
-                "type": { "const": "payment_initiation" },
-                "instructed_amount": {
-                    "type": "object",
-                    "required": ["currency", "amount"]
-                },
-                "creditor_account": {
-                    "type": "object",
-                    "required": ["iban"]
-                }
-            },
-            "additionalProperties": false
-        }
-        }
-    }
-    }
-
 # Resource Server Error Signaling with insufficient_authorization_details
 
 ## Overview

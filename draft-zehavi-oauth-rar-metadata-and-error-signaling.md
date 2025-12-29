@@ -170,7 +170,7 @@ This document extends FiPA's  error response,
 by adding the following error codes:
 
 "error":
-:    REQUIRED.  A single ASCII {{USASCII}} error code from the following:
+:    REQUIRED.  A single ASCII error code from the following:
 
      "insufficient_information":
      :     the Authorization Server requires additional user input,

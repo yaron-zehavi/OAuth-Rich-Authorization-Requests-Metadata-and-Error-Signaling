@@ -4,23 +4,16 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>OAuth 2.0 direct interation for native clients using federation</title>
+<title>OAuth 2.0 Rich Authorization Requests Metadata and Error Signaling</title>
 <meta content="Yaron Zehavi" name="author">
 <meta content="Aaron Parecki" name="author">
 <meta content="
-       OAuth 2.0 for First-Party Applications (FiPA)   defined a native
-OAuth 2.0  direct interaction , whereby clients call authorization server's  Native Authorization
-Endpoint  as an HTTP REST API, whose response instructs client what information
-to collect from end-user to satisfy authorization server's policies and requirements. 
-       While FiPA   focused on a one-to-one relationship between
-client and authorization server, this document is an  extension profile  adding support
-for authorization servers to federate the interaction to a downstream authorization server,
-instruct collection of additional information from users to guide request routing or instruct
-the usage of a native app for user interaction. 
+       OAuth 2.0 Rich Authorization Requests (RAR), as defined in  , enables clients to request fine-grained authorization using structured JSON objects. While RAR   standardizes the exchange and handling of authorization details, it does not define a mechanism for clients to discover how to construct valid authorization detail types. 
+       This document defines a machine-readable metadata structure for advertising authorization detail type documentation and JSON Schema definitions via OAuth Authorization Server Metadata   and OAuth Resource Server Metadata  . In addition, this document defines a new OAuth error code,  insufficient_authorization_details , enabling resource servers to return actionable authorization detail information to clients. 
     " name="description">
 <meta content="xml2rfc 3.31.0" name="generator">
-<meta content="native apps" name="keyword">
-<meta content="first-party" name="keyword">
+<meta content="RAR" name="keyword">
+<meta content="Step-up" name="keyword">
 <meta content="oauth" name="keyword">
 <meta content="draft-zehavi-oauth-rar-metadata-and-error-signaling-latest" name="ietf.draft">
 <!-- Generator version information:
@@ -1053,7 +1046,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <table class="ears">
 <thead><tr>
 <td class="left">Internet-Draft</td>
-<td class="center">OAuth native clients with federation</td>
+<td class="center">OAuth RAR Metadata and Error Signaling</td>
 <td class="right">December 2025</td>
 </tr></thead>
 <tfoot><tr>
@@ -1090,18 +1083,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </dd>
 </dl>
 </div>
-<h1 id="title">OAuth 2.0 direct interation for native clients using federation</h1>
+<h1 id="title">OAuth 2.0 Rich Authorization Requests Metadata and Error Signaling</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">OAuth 2.0 for First-Party Applications (FiPA) <span>[<a href="#I-D.ietf-oauth-first-party-apps" class="cite xref">I-D.ietf-oauth-first-party-apps</a>]</span> defined a native
-OAuth 2.0 <strong>direct interaction</strong>, whereby clients call authorization server's <em>Native Authorization
-Endpoint</em> as an HTTP REST API, whose response instructs client what information
-to collect from end-user to satisfy authorization server's policies and requirements.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
-<p id="section-abstract-2">While FiPA <span>[<a href="#I-D.ietf-oauth-first-party-apps" class="cite xref">I-D.ietf-oauth-first-party-apps</a>]</span> focused on a one-to-one relationship between
-client and authorization server, this document is an <strong>extension profile</strong> adding support
-for authorization servers to federate the interaction to a downstream authorization server,
-instruct collection of additional information from users to guide request routing or instruct
-the usage of a native app for user interaction.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">OAuth 2.0 Rich Authorization Requests (RAR), as defined in <span>[<a href="#RFC9396" class="cite xref">RFC9396</a>]</span>, enables clients to request fine-grained authorization using structured JSON objects. While RAR <span>[<a href="#RFC9396" class="cite xref">RFC9396</a>]</span> standardizes the exchange and handling of authorization details, it does not define a mechanism for clients to discover how to construct valid authorization detail types.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">This document defines a machine-readable metadata structure for advertising authorization detail type documentation and JSON Schema definitions via OAuth Authorization Server Metadata <span>[<a href="#RFC8414" class="cite xref">RFC8414</a>]</span> and OAuth Resource Server Metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>. In addition, this document defines a new OAuth error code, <code>insufficient_authorization_details</code>, enabling resource servers to return actionable authorization detail information to clients.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1109,7 +1095,7 @@ the usage of a native app for user interaction.<a href="#section-abstract-2" cla
       </h2>
 <p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
 <p id="section-note.1-2">
-        The latest revision of this draft can be found at <span><a href="https://yaron-zehavi.github.io/oauth-native-clients-direct-interation-with-federation/draft-zehavi-oauth-native-clients-direct-interation-with-federation.html">https://yaron-zehavi.github.io/oauth-native-clients-direct-interation-with-federation/draft-zehavi-oauth-native-clients-direct-interation-with-federation.html</a></span>.
+        The latest revision of this draft can be found at <span><a href="https://yaron-zehavi.github.io/OAuth-Rich-Authorization-Requests-Metadata-and-Error-Signaling/draft-zehavi-oauth-rar-metadata-and-error-signaling.html">https://yaron-zehavi.github.io/OAuth-Rich-Authorization-Requests-Metadata-and-Error-Signaling/draft-zehavi-oauth-rar-metadata-and-error-signaling.html</a></span>.
         Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-zehavi-oauth-rar-metadata-and-error-signaling/">https://datatracker.ietf.org/doc/draft-zehavi-oauth-rar-metadata-and-error-signaling/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
 <p id="section-note.1-3">
         Discussion of this document takes place on the
@@ -1117,7 +1103,7 @@ the usage of a native app for user interaction.<a href="#section-abstract-2" cla
         which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/oauth/">https://mailarchive.ietf.org/arch/browse/oauth/</a></span>.
         Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/oauth/">https://www.ietf.org/mailman/listinfo/oauth/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
 <p id="section-note.1-4">Source for this draft and an issue tracker can be found at
-        <span><a href="https://github.com/yaron-zehavi/oauth-native-clients-direct-interation-with-federation">https://github.com/yaron-zehavi/oauth-native-clients-direct-interation-with-federation</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+        <span><a href="https://github.com/https://github.com/yaron-zehavi/OAuth-Rich-Authorization-Requests-Metadata-and-Error-Signaling">https://github.com/https://github.com/yaron-zehavi/OAuth-Rich-Authorization-Requests-Metadata-and-Error-Signaling</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1265,19 +1251,23 @@ the usage of a native app for user interaction.<a href="#section-abstract-2" cla
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">This document, OAuth 2.0 direct interation for native clients using federation,
-extends FiPA <span>[<a href="#I-D.ietf-oauth-first-party-apps" class="cite xref">I-D.ietf-oauth-first-party-apps</a>]</span> to enable federation based flows,
-while retaining client's direct interaction with end-user.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">The client calls the <em>Native Authorization Endpoint</em> as an HTTP REST API, and receives
-instructions via the protocol established by FiPA, guiding client to interact with
-downstream authorization servers. This establishes a multi authorization server
-federated flow, whose user interactions are driven by the client app.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">This document extends FiPA <span>[<a href="#I-D.ietf-oauth-first-party-apps" class="cite xref">I-D.ietf-oauth-first-party-apps</a>]</span> with new error responses:
-<code>federate</code>, <code>redirect_to_app</code>, <code>insufficient_information</code> and
-<code>native_authorization_federate_unsupported</code>.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">It also adds additional response parameters:
-<code>federation_uri</code>, <code>federation_body</code>, <code>response_uri</code>, <code>deep_link</code>.<a href="#section-1-4" class="pilcrow">¶</a></p>
-<p id="section-1-5">And adds the <code>native_callback_uri</code> request parameter.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-1">OAuth 2.0 Rich Authorization Requests (RAR) <span>[<a href="#RFC9396" class="cite xref">RFC9396</a>]</span> allow OAuth clients to request structured, fine-grained authorization beyond simple scopes. This has enabled advanced authorization models across domains such as open banking &amp; API marketplaces, and is well positioned to be used for authorizing AI agent state-changing actions.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">However, RAR <span>[<a href="#RFC9396" class="cite xref">RFC9396</a>]</span> does not specify how a client discovers the structure of supported authorization_detail types and how to construct syntactically valid authorization details.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">As a result, clients must rely on out-of-band documentation or static ecosystem profiles, limiting interoperability and preventing dynamic client behavior.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">This document addresses this gap by defining:<a href="#section-1-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-1-5.1">
+          <p id="section-1-5.1.1">A metadata structure for authorization detail types, containing both human-readable documentation as well as embedded JSON Schema definitions.<a href="#section-1-5.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-5.2">
+          <p id="section-1-5.2.1">Discovery through Authorization Server Metadata <span>[<a href="#RFC8414" class="cite xref">RFC8414</a>]</span>, as well as via OAuth 2.0 Protected Resource Metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>.<a href="#section-1-5.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-5.3">
+          <p id="section-1-5.3.1">A standardized error signaling mechanism allowing resource servers to return an authorization details object, to be included in a new Auth request, in order to accomplish a specific request.<a href="#section-1-5.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-1-6">It is up to implementers to decide if their clients need to learn to construct valid authorization details objects, and if so whether authorization details types metadata should be provided by authorization servers or by resource servers.<a href="#section-1-6" class="pilcrow">¶</a></p>
+<p id="section-1-7">Alternatively they may decide clients do not need to learn to construct valid authorization details objects, and interoperability shall be achieved by resource servers providing required authorization_details in their error signals, which clients then include in subsequent OAuth requests.<a href="#section-1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1372,7 +1362,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
             <p id="section-3.1-3.2.1">(B) The client initiates the authorization request by making a POST request to the Native Authorization Endpoint of Authorization Server 1.<a href="#section-3.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.1-3.3">
-            <p id="section-3.1-3.3.1">(C) Authorization Server 1 decides to federate the user to Authorization Server 2. To do so it contacts Authorization Server 2's PAR <span>[<a href="#RFC9126" class="cite xref">RFC9126</a>]</span> endpoint, then returns the <code>federate</code> error code together with the <em>federation_uri</em>, <em>federation_body</em>, <em>response_uri</em> and <em>auth_session</em> response attributes.<a href="#section-3.1-3.3.1" class="pilcrow">¶</a></p>
+            <p id="section-3.1-3.3.1">(C) Authorization Server 1 decides to federate the user to Authorization Server 2. To do so it contacts Authorization Server 2's PAR endpoint, then returns the <code>federate</code> error code together with the <em>federation_uri</em>, <em>federation_body</em>, <em>response_uri</em> and <em>auth_session</em> response attributes.<a href="#section-3.1-3.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.1-3.4">
             <p id="section-3.1-3.4.1">(D) The client calls Authorization Server 2's Native Authorization Endpoint, as instructed by Authorization Server 1.<a href="#section-3.1-3.4.1" class="pilcrow">¶</a></p>
@@ -1413,11 +1403,11 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         <h3 id="name-native-authorization-endpoi">
 <a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-native-authorization-endpoi" class="section-name selfRef">Native Authorization Endpoint</a>
         </h3>
-<p id="section-4.1-1">The native authorization endpoint defined by FiPA <span>[<a href="#I-D.ietf-oauth-first-party-apps" class="cite xref">I-D.ietf-oauth-first-party-apps</a>]</span> is used by this document.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-1">The native authorization endpoint defined by is used by this document.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <p id="section-4.1-2">This document adds the <em>native_callback_uri</em> parameter to the native authorization endpoint, to support
 cross-app native user navigation.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
 <p id="section-4.1-3">Before authorization servers instruct a client to federate to a downstream authorization server, they <span class="bcp14">MUST</span> ensure it offers a <em>native_authorization_endpoint</em>, otherwise return the error native_authorization_federate_unsupported*.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
-<p id="section-4.1-4">When federating to downstream authorization servers, the usage of PAR <span>[<a href="#RFC9126" class="cite xref">RFC9126</a>]</span> with client authentication is <span class="bcp14">REQUIRED</span>, as the native client calling the Native Authorization Endpoint of a federated authorization server is not <em>its</em> OAuth client and therefore has no other means of authenticating.
+<p id="section-4.1-4">When federating to downstream authorization servers, the usage of PAR with client authentication is <span class="bcp14">REQUIRED</span>, as the native client calling the Native Authorization Endpoint of a federated authorization server is not <em>its</em> OAuth client and therefore has no other means of authenticating.
 When using PAR with client authentication, the request_uri provided to the Native Authorization Endpoint attests that client authentication took place.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1426,7 +1416,7 @@ When using PAR with client authentication, the request_uri provided to the Nativ
         <h3 id="name-native-authorization-reques">
 <a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-native-authorization-reques" class="section-name selfRef">Native Authorization Request</a>
         </h3>
-<p id="section-4.2-1">The native authorization endpoint is called as defined by FiPA <span>[<a href="#I-D.ietf-oauth-first-party-apps" class="cite xref">I-D.ietf-oauth-first-party-apps</a>]</span>.
+<p id="section-4.2-1">The native authorization endpoint is called as defined by FiPA .
 This document adds the following request parameter:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-4.2-2">
           <dt id="section-4.2-2.1">"native_callback_uri":</dt>
@@ -1442,12 +1432,12 @@ This document adds the following request parameter:<a href="#section-4.2-1" clas
         <h3 id="name-native-authorization-respon">
 <a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-native-authorization-respon" class="section-name selfRef">Native Authorization Response</a>
         </h3>
-<p id="section-4.3-1">This document extends FiPA's <span>[<a href="#I-D.ietf-oauth-first-party-apps" class="cite xref">I-D.ietf-oauth-first-party-apps</a>]</span> error response,
+<p id="section-4.3-1">This document extends FiPA's  error response,
 by adding the following error codes:<a href="#section-4.3-1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-4.3-2">
           <dt id="section-4.3-2.1">"error":</dt>
           <dd style="margin-left: 1.5em" id="section-4.3-2.2">
-            <p id="section-4.3-2.2.1"><span class="bcp14">REQUIRED</span>.  A single ASCII <span>[<a href="#USASCII" class="cite xref">USASCII</a>]</span> error code from the following:<a href="#section-4.3-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-4.3-2.2.1"><span class="bcp14">REQUIRED</span>.  A single ASCII error code from the following:<a href="#section-4.3-2.2.1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-4.3-2.2.2">
               <dt id="section-4.3-2.2.2.1">"insufficient_information":</dt>
               <dd style="margin-left: 1.5em" id="section-4.3-2.2.2.2">
@@ -1520,7 +1510,7 @@ which shall receive the response from the federated authorization server.<a href
 responds with error code <em>federate</em> and <span class="bcp14">MUST</span> return the <em>federation_uri</em>,
 <em>federation_body</em>, <em>response_uri</em> and <em>auth_session</em> response attributes.<a href="#section-4.3.1-1" class="pilcrow">¶</a></p>
 <p id="section-4.3.1-2">When federating to another authorization server:
-* Federating authorization server <span class="bcp14">MUST</span> use PAR <span>[<a href="#RFC9126" class="cite xref">RFC9126</a>]</span> and include <em>request_uri</em> in federation_body.
+* Federating authorization server <span class="bcp14">MUST</span> use PAR and include <em>request_uri</em> in federation_body.
 * If <em>native_callback_uri</em> was included in the native authorization request, it <span class="bcp14">MUST</span> be included when calling federated authorization server's Native Authorization Endpoint.<a href="#section-4.3.1-2" class="pilcrow">¶</a></p>
 <p id="section-4.3.1-3">Example <strong>federating</strong> response:<a href="#section-4.3.1-3" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-4.3.1-4">
@@ -1555,7 +1545,7 @@ as application/x-www-form-urlencoded request body for the <em>response_uri</em> 
 <strong>federating</strong> authorization server which <span class="bcp14">SHALL</span> be invoked using HTTP POST.<a href="#section-4.3.1-7" class="pilcrow">¶</a></p>
 <p id="section-4.3.1-8">However, when <strong>federated</strong> authorization server returns the following error codes:
 <em>federate</em>, <em>insufficient_authorization</em>, <em>insufficient_information</em>, <em>redirect_to_app</em>,
-<em>redirect_to_web</em>, client <span class="bcp14">MUST</span> handle these errors according to FiPA <span>[<a href="#I-D.ietf-oauth-first-party-apps" class="cite xref">I-D.ietf-oauth-first-party-apps</a>]</span> and this specification.<a href="#section-4.3.1-8" class="pilcrow">¶</a></p>
+<em>redirect_to_web</em>, client <span class="bcp14">MUST</span> handle these errors according to and this specification.<a href="#section-4.3.1-8" class="pilcrow">¶</a></p>
 <p id="section-4.3.1-9">Example client calling receiving an authorization code response from the federated
 authorization server:<a href="#section-4.3.1-9" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-4.3.1-10">
@@ -1625,8 +1615,7 @@ flow and <span class="bcp14">MAY</span> attempt a normal non-native OAuth flow.<
 </li>
           </ul>
 <p id="section-4.3.2-7">Note - trust establishment mechanisms in <em>native_callback_uri</em> are out of scope of this specification.
-However we assume closed ecosystems could employ an allowList, and open ecosystems could leverage
-<span>[<a href="#OpenID.Federation" class="cite xref">OpenID.Federation</a>]</span>:<a href="#section-4.3.2-7" class="pilcrow">¶</a></p>
+However we assume closed ecosystems could employ an allowList, and open ecosystems could leverage:<a href="#section-4.3.2-7" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-4.3.2-8.1">
               <p id="section-4.3.2-8.1.1">Extract native_callback_uri's DNS domain.<a href="#section-4.3.2-8.1.1" class="pilcrow">¶</a></p>
@@ -1857,17 +1846,9 @@ not first party clients.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
       </h2>
 <dl class="references">
-<dt id="I-D.ietf-oauth-first-party-apps">[I-D.ietf-oauth-first-party-apps]</dt>
-      <dd>
-<span class="refAuthor">Parecki, A.</span>, <span class="refAuthor">Fletcher, G.</span>, and <span class="refAuthor">P. Kasselman</span>, <span class="refTitle">"OAuth 2.0 for First-Party Applications"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-oauth-first-party-apps-02</span>, <time datetime="2025-10-20" class="refDate">20 October 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-first-party-apps-02">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-first-party-apps-02</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="IANA.oauth-parameters">[IANA.oauth-parameters]</dt>
       <dd>
 <span class="refAuthor">IANA</span>, <span class="refTitle">"OAuth Parameters"</span>, <span>&lt;<a href="https://www.iana.org/assignments/oauth-parameters">https://www.iana.org/assignments/oauth-parameters</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="OpenID.Federation">[OpenID.Federation]</dt>
-      <dd>
-<span class="refAuthor">Hedberg, Ed, R.</span>, <span class="refAuthor">Jones, M. B.</span>, <span class="refAuthor">Solberg, A. A.</span>, <span class="refAuthor">Bradley, J.</span>, <span class="refAuthor">De Marco, G.</span>, and <span class="refAuthor">V. Dzhuvinov</span>, <span class="refTitle">"OpenID Federation 1.0"</span>, <time datetime="2025-03" class="refDate">March 2025</time>, <span>&lt;<a href="https://openid.net/specs/openid-federation-1_0.html">https://openid.net/specs/openid-federation-1_0.html</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
       <dd>
@@ -1881,17 +1862,17 @@ not first party clients.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
       <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC9126">[RFC9126]</dt>
+<dt id="RFC8414">[RFC8414]</dt>
       <dd>
-<span class="refAuthor">Lodderstedt, T.</span>, <span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Sakimura, N.</span>, <span class="refAuthor">Tonge, D.</span>, and <span class="refAuthor">F. Skokan</span>, <span class="refTitle">"OAuth 2.0 Pushed Authorization Requests"</span>, <span class="seriesInfo">RFC 9126</span>, <span class="seriesInfo">DOI 10.17487/RFC9126</span>, <time datetime="2021-09" class="refDate">September 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9126">https://www.rfc-editor.org/rfc/rfc9126</a>&gt;</span>. </dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Sakimura, N.</span>, and <span class="refAuthor">J. Bradley</span>, <span class="refTitle">"OAuth 2.0 Authorization Server Metadata"</span>, <span class="seriesInfo">RFC 8414</span>, <span class="seriesInfo">DOI 10.17487/RFC8414</span>, <time datetime="2018-06" class="refDate">June 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8414">https://www.rfc-editor.org/rfc/rfc8414</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9396">[RFC9396]</dt>
       <dd>
 <span class="refAuthor">Lodderstedt, T.</span>, <span class="refAuthor">Richer, J.</span>, and <span class="refAuthor">B. Campbell</span>, <span class="refTitle">"OAuth 2.0 Rich Authorization Requests"</span>, <span class="seriesInfo">RFC 9396</span>, <span class="seriesInfo">DOI 10.17487/RFC9396</span>, <time datetime="2023-05" class="refDate">May 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9396">https://www.rfc-editor.org/rfc/rfc9396</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="USASCII">[USASCII]</dt>
+<dt id="RFC9728">[RFC9728]</dt>
     <dd>
-<span class="refAuthor">Institute, A. N. S.</span>, <span class="refTitle">"Coded Character Set -- 7-bit American Standard Code for Information Interchange, ANSI X3.4"</span>, <time datetime="1986" class="refDate">1986</time>. </dd>
+<span class="refAuthor">Jones, M.B.</span>, <span class="refAuthor">Hunt, P.</span>, and <span class="refAuthor">A. Parecki</span>, <span class="refTitle">"OAuth 2.0 Protected Resource Metadata"</span>, <span class="seriesInfo">RFC 9728</span>, <span class="seriesInfo">DOI 10.17487/RFC9728</span>, <time datetime="2025-04" class="refDate">April 2025</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9728">https://www.rfc-editor.org/rfc/rfc9728</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -1994,7 +1975,7 @@ Content-Type: application/json
 </pre><a href="#appendix-A.1.2-4" class="pilcrow">¶</a>
 </div>
 <p id="appendix-A.1.2-5">If native authorization endpoint is supported by the federated authorization server,
-as-1.com performs a PAR <span>[<a href="#RFC9126" class="cite xref">RFC9126</a>]</span> request to as-2.com's pushed authorization endpoint,
+as-1.com performs a PAR request to as-2.com's pushed authorization endpoint,
 including the original <em>native_callback_uri</em>:<a href="#appendix-A.1.2-5" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="appendix-A.1.2-6">
 <pre>

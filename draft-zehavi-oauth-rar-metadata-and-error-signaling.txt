@@ -9,36 +9,36 @@ Expires: 2 July 2026                                                Okta
                                                         29 December 2025
 
 
-    OAuth 2.0 direct interation for native clients using federation
+   OAuth 2.0 Rich Authorization Requests Metadata and Error Signaling
        draft-zehavi-oauth-rar-metadata-and-error-signaling-latest
 
 Abstract
 
-   OAuth 2.0 for First-Party Applications (FiPA)
-   [I-D.ietf-oauth-first-party-apps] defined a native OAuth 2.0 *direct
-   interaction*, whereby clients call authorization server's _Native
-   Authorization Endpoint_ as an HTTP REST API, whose response instructs
-   client what information to collect from end-user to satisfy
-   authorization server's policies and requirements.
+   OAuth 2.0 Rich Authorization Requests (RAR), as defined in [RFC9396],
+   enables clients to request fine-grained authorization using
+   structured JSON objects.  While RAR [RFC9396] standardizes the
+   exchange and handling of authorization details, it does not define a
+   mechanism for clients to discover how to construct valid
+   authorization detail types.
 
-   While FiPA [I-D.ietf-oauth-first-party-apps] focused on a one-to-one
-   relationship between client and authorization server, this document
-   is an *extension profile* adding support for authorization servers to
-   federate the interaction to a downstream authorization server,
-   instruct collection of additional information from users to guide
-   request routing or instruct the usage of a native app for user
-   interaction.
+   This document defines a machine-readable metadata structure for
+   advertising authorization detail type documentation and JSON Schema
+   definitions via OAuth Authorization Server Metadata [RFC8414] and
+   OAuth Resource Server Metadata [RFC9728].  In addition, this document
+   defines a new OAuth error code, insufficient_authorization_details,
+   enabling resource servers to return actionable authorization detail
+   information to clients.
 
 About This Document
 
    This note is to be removed before publishing as an RFC.
 
    The latest revision of this draft can be found at https://yaron-
-   zehavi.github.io/oauth-native-clients-direct-interation-with-
-   federation/draft-zehavi-oauth-native-clients-direct-interation-with-
-   federation.html.  Status information for this document may be found
-   at https://datatracker.ietf.org/doc/draft-zehavi-oauth-rar-metadata-
-   and-error-signaling/.
+   zehavi.github.io/OAuth-Rich-Authorization-Requests-Metadata-and-
+   Error-Signaling/draft-zehavi-oauth-rar-metadata-and-error-
+   signaling.html.  Status information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-zehavi-oauth-rar-metadata-and-
+   error-signaling/.
 
    Discussion of this document takes place on the Web Authorization
    Protocol Working Group mailing list (mailto:oauth@ietf.org), which is
@@ -46,8 +46,8 @@ About This Document
    Subscribe at https://www.ietf.org/mailman/listinfo/oauth/.
 
    Source for this draft and an issue tracker can be found at
-   https://github.com/yaron-zehavi/oauth-native-clients-direct-
-   interation-with-federation.
+   https://github.com/https://github.com/yaron-zehavi/OAuth-Rich-
+   Authorization-Requests-Metadata-and-Error-Signaling.
 
 Status of This Memo
 
@@ -114,25 +114,44 @@ Table of Contents
 
 1.  Introduction
 
-   This document, OAuth 2.0 direct interation for native clients using
-   federation, extends FiPA [I-D.ietf-oauth-first-party-apps] to enable
-   federation based flows, while retaining client's direct interaction
-   with end-user.
+   OAuth 2.0 Rich Authorization Requests (RAR) [RFC9396] allow OAuth
+   clients to request structured, fine-grained authorization beyond
+   simple scopes.  This has enabled advanced authorization models across
+   domains such as open banking & API marketplaces, and is well
+   positioned to be used for authorizing AI agent state-changing
+   actions.
 
-   The client calls the _Native Authorization Endpoint_ as an HTTP REST
-   API, and receives instructions via the protocol established by FiPA,
-   guiding client to interact with downstream authorization servers.
-   This establishes a multi authorization server federated flow, whose
-   user interactions are driven by the client app.
+   However, RAR [RFC9396] does not specify how a client discovers the
+   structure of supported authorization_detail types and how to
+   construct syntactically valid authorization details.
 
-   This document extends FiPA [I-D.ietf-oauth-first-party-apps] with new
-   error responses: federate, redirect_to_app, insufficient_information
-   and native_authorization_federate_unsupported.
+   As a result, clients must rely on out-of-band documentation or static
+   ecosystem profiles, limiting interoperability and preventing dynamic
+   client behavior.
 
-   It also adds additional response parameters: federation_uri,
-   federation_body, response_uri, deep_link.
+   This document addresses this gap by defining:
 
-   And adds the native_callback_uri request parameter.
+   *  A metadata structure for authorization detail types, containing
+      both human-readable documentation as well as embedded JSON Schema
+      definitions.
+
+   *  Discovery through Authorization Server Metadata [RFC8414], as well
+      as via OAuth 2.0 Protected Resource Metadata [RFC9728].
+
+   *  A standardized error signaling mechanism allowing resource servers
+      to return an authorization details object, to be included in a new
+      Auth request, in order to accomplish a specific request.
+
+   It is up to implementers to decide if their clients need to learn to
+   construct valid authorization details objects, and if so whether
+   authorization details types metadata should be provided by
+   authorization servers or by resource servers.
+
+   Alternatively they may decide clients do not need to learn to
+   construct valid authorization details objects, and interoperability
+   shall be achieved by resource servers providing required
+   authorization_details in their error signals, which clients then
+   include in subsequent OAuth requests.
 
 2.  Conventions and Definitions
 
@@ -216,9 +235,9 @@ Table of Contents
 
    *  (C) Authorization Server 1 decides to federate the user to
       Authorization Server 2.  To do so it contacts Authorization Server
-      2's PAR [RFC9126] endpoint, then returns the federate error code
-      together with the _federation_uri_, _federation_body_,
-      _response_uri_ and _auth_session_ response attributes.
+      2's PAR endpoint, then returns the federate error code together
+      with the _federation_uri_, _federation_body_, _response_uri_ and
+      _auth_session_ response attributes.
 
    *  (D) The client calls Authorization Server 2's Native Authorization
       Endpoint, as instructed by Authorization Server 1.
@@ -248,8 +267,8 @@ Table of Contents
 
 4.1.  Native Authorization Endpoint
 
-   The native authorization endpoint defined by FiPA
-   [I-D.ietf-oauth-first-party-apps] is used by this document.
+   The native authorization endpoint defined by is used by this
+   document.
 
    This document adds the _native_callback_uri_ parameter to the native
    authorization endpoint, to support cross-app native user navigation.
@@ -260,18 +279,17 @@ Table of Contents
    native_authorization_federate_unsupported*.
 
    When federating to downstream authorization servers, the usage of PAR
-   [RFC9126] with client authentication is REQUIRED, as the native
-   client calling the Native Authorization Endpoint of a federated
-   authorization server is not _its_ OAuth client and therefore has no
-   other means of authenticating.  When using PAR with client
-   authentication, the request_uri provided to the Native Authorization
-   Endpoint attests that client authentication took place.
+   with client authentication is REQUIRED, as the native client calling
+   the Native Authorization Endpoint of a federated authorization server
+   is not _its_ OAuth client and therefore has no other means of
+   authenticating.  When using PAR with client authentication, the
+   request_uri provided to the Native Authorization Endpoint attests
+   that client authentication took place.
 
 4.2.  Native Authorization Request
 
-   The native authorization endpoint is called as defined by FiPA
-   [I-D.ietf-oauth-first-party-apps].  This document adds the following
-   request parameter:
+   The native authorization endpoint is called as defined by FiPA . This
+   document adds the following request parameter:
 
    "native_callback_uri":  OPTIONAL.  Native client app's
       *redirect_uri*, claimed as deep link. _native_callback_uri_ SHALL
@@ -283,11 +301,10 @@ Table of Contents
 
 4.3.  Native Authorization Response
 
-   This document extends FiPA's [I-D.ietf-oauth-first-party-apps] error
-   response, by adding the following error codes:
+   This document extends FiPA's error response, by adding the following
+   error codes:
 
-   "error":  REQUIRED.  A single ASCII [USASCII] error code from the
-      following:
+   "error":  REQUIRED.  A single ASCII error code from the following:
 
       "insufficient_information":  the Authorization Server requires
          additional user input, other than an authentication challenge,
@@ -334,8 +351,8 @@ Table of Contents
    _auth_session_ response attributes.
 
    When federating to another authorization server: * Federating
-   authorization server MUST use PAR [RFC9126] and include _request_uri_
-   in federation_body. * If _native_callback_uri_ was included in the
+   authorization server MUST use PAR and include _request_uri_ in
+   federation_body. * If _native_callback_uri_ was included in the
    native authorization request, it MUST be included when calling
    federated authorization server's Native Authorization Endpoint.
 
@@ -372,8 +389,7 @@ Table of Contents
    However, when *federated* authorization server returns the following
    error codes: _federate_, _insufficient_authorization_,
    _insufficient_information_, _redirect_to_app_, _redirect_to_web_,
-   client MUST handle these errors according to FiPA
-   [I-D.ietf-oauth-first-party-apps] and this specification.
+   client MUST handle these errors according to and this specification.
 
    Example client calling receiving an authorization code response from
    the federated authorization server:
@@ -437,7 +453,7 @@ Table of Contents
    Note - trust establishment mechanisms in _native_callback_uri_ are
    out of scope of this specification.  However we assume closed
    ecosystems could employ an allowList, and open ecosystems could
-   leverage [OpenID.Federation]:
+   leverage:
 
    *  Extract native_callback_uri's DNS domain.
 
@@ -624,22 +640,9 @@ Table of Contents
 
 7.  Normative References
 
-   [I-D.ietf-oauth-first-party-apps]
-              Parecki, A., Fletcher, G., and P. Kasselman, "OAuth 2.0
-              for First-Party Applications", Work in Progress, Internet-
-              Draft, draft-ietf-oauth-first-party-apps-02, 20 October
-              2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
-              oauth-first-party-apps-02>.
-
    [IANA.oauth-parameters]
               IANA, "OAuth Parameters",
               <https://www.iana.org/assignments/oauth-parameters>.
-
-   [OpenID.Federation]
-              Hedberg, Ed, R., Jones, M. B., Solberg, A. A., Bradley,
-              J., De Marco, G., and V. Dzhuvinov, "OpenID Federation
-              1.0", March 2025,
-              <https://openid.net/specs/openid-federation-1_0.html>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -654,19 +657,20 @@ Table of Contents
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
-   [RFC9126]  Lodderstedt, T., Campbell, B., Sakimura, N., Tonge, D.,
-              and F. Skokan, "OAuth 2.0 Pushed Authorization Requests",
-              RFC 9126, DOI 10.17487/RFC9126, September 2021,
-              <https://www.rfc-editor.org/rfc/rfc9126>.
+   [RFC8414]  Jones, M., Sakimura, N., and J. Bradley, "OAuth 2.0
+              Authorization Server Metadata", RFC 8414,
+              DOI 10.17487/RFC8414, June 2018,
+              <https://www.rfc-editor.org/rfc/rfc8414>.
 
    [RFC9396]  Lodderstedt, T., Richer, J., and B. Campbell, "OAuth 2.0
               Rich Authorization Requests", RFC 9396,
               DOI 10.17487/RFC9396, May 2023,
               <https://www.rfc-editor.org/rfc/rfc9396>.
 
-   [USASCII]  Institute, A. N. S., "Coded Character Set -- 7-bit
-              American Standard Code for Information Interchange, ANSI
-              X3.4", 1986.
+   [RFC9728]  Jones, M.B., Hunt, P., and A. Parecki, "OAuth 2.0
+              Protected Resource Metadata", RFC 9728,
+              DOI 10.17487/RFC9728, April 2025,
+              <https://www.rfc-editor.org/rfc/rfc9728>.
 
 Appendix A.  Example User Experiences
 
@@ -750,8 +754,8 @@ A.1.2.  Client makes initial request and receives "federate" error
    }
 
    If native authorization endpoint is supported by the federated
-   authorization server, as-1.com performs a PAR [RFC9126] request to
-   as-2.com's pushed authorization endpoint, including the original
+   authorization server, as-1.com performs a PAR request to as-2.com's
+   pushed authorization endpoint, including the original
    _native_callback_uri_:
 
    POST /par HTTP/1.1

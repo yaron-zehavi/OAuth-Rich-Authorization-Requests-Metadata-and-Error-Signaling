@@ -140,16 +140,6 @@ There are two main proposed flows, which may be combined:
 Figure: Native client federated, then redirected to app
 
 - (A) The client starts the flow.
-- (B) The client initiates the authorization request by making a POST request to the Native Authorization Endpoint of Authorization Server 1.
-- (C) Authorization Server 1 decides to federate the user to Authorization Server 2. To do so it contacts Authorization Server 2's PAR endpoint, then returns the `federate` error code together with the *federation_uri*, *federation_body*, *response_uri* and *auth_session* response attributes.
-- (D) The client calls Authorization Server 2's Native Authorization Endpoint, as instructed by Authorization Server 1.
-- (E) Authorization Server 2 decides to use a native app, and therefore responds with the `redirect_to_app` error code together with the *deep_link* response attribute.
-- (F) The client invokes the app using the deep_link.
-- (G) The app interacts with user and if satisifed, returns an authorization code, regarded as Authorization Server 2's response to Authorization Server 1's federation to it.
-- (H) The client provides the authorization code to Authorization Server 1.
-- (I) Authorization Server 1 returns an authorization code.
-- (J) The client sends the authorization code received in step (I) to obtain a token from the Token Endpoint.
-- (K) Authorization Server 1 returns an Access Token from the Token Endpoint.
 
 ## Client obtains authorization details object
 
@@ -263,14 +253,6 @@ WWW-Authenticate: Bearer error="insufficient_authorization_details",
  authorization_details="{JSON or base64url-encoded JSON of required RAR}"
 
 # Security Considerations {#security-considerations}
-
-## Non First-Party applications of federated authorization servers {#first-party-applications}
-
-A federated authorization server should consider end-user's privacy and security
-to determine if it should present authorization challenges in federation scenarios.
-For example, it can label **federating** clients as such and avoid serving them
-authorization challenges, as user-serving clients receiving those challenges are
-not first party clients.
 
 # IANA Considerations
 

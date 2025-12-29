@@ -40,7 +40,7 @@ normative:
   RFC9728:
   IANA.oauth-parameters:
   JSON.Schema:
-    title: JSON Schema: A Media Type for Describing JSON Documents
+    title: "JSON Schema: A Media Type for Describing JSON Documents"
     target: https://json-schema.org/draft/2020-12/json-schema-core
     date: June 16, 2022
     author:

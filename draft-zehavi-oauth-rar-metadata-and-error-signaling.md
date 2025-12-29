@@ -204,7 +204,6 @@ The `authorization_details_types_metadata` attribute is a JSON object whose keys
 
 ### Example Authorization Detail Type Metadata: Payment Initiation
 
-    ```json
     {
     "authorization_details_types_supported": ["payment_initiation"],
     "authorization_details_types_metadata": {
@@ -217,15 +216,15 @@ The `authorization_details_types_metadata` attribute is a JSON object whose keys
             "type": "object",
             "required": ["type", "instructed_amount", "creditor_account"],
             "properties": {
-            "type": { "const": "payment_initiation" },
-            "instructed_amount": {
-                "type": "object",
-                "required": ["currency", "amount"]
-            },
-            "creditor_account": {
-                "type": "object",
-                "required": ["iban"]
-            }
+                "type": { "const": "payment_initiation" },
+                "instructed_amount": {
+                    "type": "object",
+                    "required": ["currency", "amount"]
+                },
+                "creditor_account": {
+                    "type": "object",
+                    "required": ["iban"]
+                }
             },
             "additionalProperties": false
         }

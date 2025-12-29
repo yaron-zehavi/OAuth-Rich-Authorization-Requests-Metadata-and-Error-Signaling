@@ -62,6 +62,10 @@ This document addresses this gap by defining:
 * Discovery through Authorization Server Metadata {{RFC8414}}, as well as via OAuth 2.0 Protected Resource Metadata {{RFC9728}}.
 * A standardized error signaling mechanism allowing resource servers to return an authorization details object, to be included in a new Auth request, in order to accomplish a specific request.
 
+It is up to implementers to decide if their clients need to learn to construct valid authorization details objects, and if so whether authorization details types metadata should be provided by authorization servers or by resource servers.
+
+Alternatively they may decide clients do not need to learn to construct valid authorization details objects, and interoperability shall be achieved by resource servers providing required authorization_details in their error signals, which clients then include in subsequent OAuth requests.
+
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
@@ -128,7 +132,7 @@ Figure: Native client federated, then redirected to app
 
 - (A) The client starts the flow.
 - (B) The client initiates the authorization request by making a POST request to the Native Authorization Endpoint of Authorization Server 1.
-- (C) Authorization Server 1 decides to federate the user to Authorization Server 2. To do so it contacts Authorization Server 2's PAR {{RFC9126}} endpoint, then returns the `federate` error code together with the *federation_uri*, *federation_body*, *response_uri* and *auth_session* response attributes.
+- (C) Authorization Server 1 decides to federate the user to Authorization Server 2. To do so it contacts Authorization Server 2's PAR endpoint, then returns the `federate` error code together with the *federation_uri*, *federation_body*, *response_uri* and *auth_session* response attributes.
 - (D) The client calls Authorization Server 2's Native Authorization Endpoint, as instructed by Authorization Server 1.
 - (E) Authorization Server 2 decides to use a native app, and therefore responds with the `redirect_to_app` error code together with the *deep_link* response attribute.
 - (F) The client invokes the app using the deep_link.
@@ -142,19 +146,19 @@ Figure: Native client federated, then redirected to app
 
 ## Native Authorization Endpoint {#native-authorization-endpoint}
 
-The native authorization endpoint defined by FiPA {{I-D.ietf-oauth-first-party-apps}} is used by this document.
+The native authorization endpoint defined by is used by this document.
 
 This document adds the *native_callback_uri* parameter to the native authorization endpoint, to support
 cross-app native user navigation.
 
 Before authorization servers instruct a client to federate to a downstream authorization server, they MUST ensure it offers a *native_authorization_endpoint*, otherwise return the error native_authorization_federate_unsupported*.
 
-When federating to downstream authorization servers, the usage of PAR {{RFC9126}} with client authentication is REQUIRED, as the native client calling the Native Authorization Endpoint of a federated authorization server is not *its* OAuth client and therefore has no other means of authenticating.
+When federating to downstream authorization servers, the usage of PAR with client authentication is REQUIRED, as the native client calling the Native Authorization Endpoint of a federated authorization server is not *its* OAuth client and therefore has no other means of authenticating.
 When using PAR with client authentication, the request_uri provided to the Native Authorization Endpoint attests that client authentication took place.
 
 ## Native Authorization Request {#native-auth-request}
 
-The native authorization endpoint is called as defined by FiPA {{I-D.ietf-oauth-first-party-apps}}.
+The native authorization endpoint is called as defined by FiPA .
 This document adds the following request parameter:
 
 "native_callback_uri":
@@ -162,7 +166,7 @@ This document adds the following request parameter:
 
 ## Native Authorization Response {#native-response}
 
-This document extends FiPA's {{I-D.ietf-oauth-first-party-apps}} error response,
+This document extends FiPA's  error response,
 by adding the following error codes:
 
 "error":
@@ -216,7 +220,7 @@ responds with error code *federate* and MUST return the *federation_uri*,
 *federation_body*, *response_uri* and *auth_session* response attributes.
 
 When federating to another authorization server:
-* Federating authorization server MUST use PAR {{RFC9126}} and include *request_uri* in federation_body.
+* Federating authorization server MUST use PAR and include *request_uri* in federation_body.
 * If *native_callback_uri* was included in the native authorization request, it MUST be included when calling federated authorization server's Native Authorization Endpoint.
 
 Example **federating** response:
@@ -249,7 +253,7 @@ as application/x-www-form-urlencoded request body for the *response_uri* of the 
 
 However, when **federated** authorization server returns the following error codes:
 *federate*, *insufficient_authorization*, *insufficient_information*, *redirect_to_app*,
-*redirect_to_web*, client MUST handle these errors according to FiPA {{I-D.ietf-oauth-first-party-apps}} and this specification.
+*redirect_to_web*, client MUST handle these errors according to and this specification.
 
 Example client calling receiving an authorization code response from the federated
 authorization server:
@@ -303,8 +307,7 @@ The invoked app handles the native authorization request:
 * Uses OS mechanisms to natively invoke *native_callback_uri* and return to the client, providing it a response according to this specification's response from a Native Authorization Endpoint, as url-encoded query parameters.
 
 Note - trust establishment mechanisms in *native_callback_uri* are out of scope of this specification.
-However we assume closed ecosystems could employ an allowList, and open ecosystems could leverage
-{{OpenID.Federation}}:
+However we assume closed ecosystems could employ an allowList, and open ecosystems could leverage:
 
   * Extract native_callback_uri's DNS domain.
   * Add the path /.well-known/openid-federation and perform trust chain resolution.
@@ -540,7 +543,7 @@ it supports the native authorization endpoint. If it does not, as-1.com returns:
     }
 
 If native authorization endpoint is supported by the federated authorization server,
-as-1.com performs a PAR {{RFC9126}} request to as-2.com's pushed authorization endpoint,
+as-1.com performs a PAR request to as-2.com's pushed authorization endpoint,
 including the original *native_callback_uri*:
 
     POST /par HTTP/1.1

@@ -20,8 +20,8 @@ venue:
   type: "Working Group"
   mail: "oauth@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/oauth/"
-  github: "yaron-zehavi/oauth-native-clients-direct-interation-with-federation"
-  latest: "https://yaron-zehavi.github.io/oauth-native-clients-direct-interation-with-federation/draft-zehavi-oauth-native-clients-direct-interation-with-federation.html"
+  github: "yaron-zehavi/OAuth-Rich-Authorization-Requests-Metadata-and-Error-Signaling"
+  latest: "https://yaron-zehavi.github.io/OAuth-Rich-Authorization-Requests-Metadata-and-Error-Signaling/draft-zehavi-oauth-rar-metadata-and-error-signaling.html"
 
 author:
  -

@@ -192,9 +192,9 @@ This document defines a new metadata attribute, `authorization_details_types_met
 
 The new metadata property MAY be published by OAuth authorization servers using Authorization Server Metadata {{RFC8414}} as well as by Resource Servers using Protected Resource Metadata {{RFC9728}}.
 
-This document also proposes the existing `authorization_details_types_supported` metadata attributed defined by RAR {{RFC9396}}, be included in Protected Resource Metadata {{RFC9728}}.
-
 Clients MAY use this metadata to dynamically construct valid `authorization_details` objects.
+
+This document also proposes the existing `authorization_details_types_supported` metadata attributed defined by RAR {{RFC9396}}, be included in Protected Resource Metadata {{RFC9728}}.
 
 ## Metadata Location
 
@@ -220,7 +220,7 @@ The `authorization_details_types_metadata` attribute is a JSON object whose keys
     }
     }
 
-## Metadata Attributes
+Attributes definition:
 
 "version":
 : OPTIONAL. String identifying the version of the authorization details type definition. The value is informational and does not imply semantic version negotiation.

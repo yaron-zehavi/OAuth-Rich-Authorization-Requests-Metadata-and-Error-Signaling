@@ -1158,10 +1158,10 @@ svg :is([fill="white"], [fill^="#fff"]) {
             <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-protocol-overview" class="internal xref">Protocol Overview</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
-                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-client-obtains-authorizatio" class="internal xref">Client obtains authorization details type metadata</a></p>
+                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-client-learns-to-construct-" class="internal xref">Client learns to construct valid authorization details objects from metadata</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
-                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-client-obtains-authorization" class="internal xref">Client obtains authorization details object</a></p>
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-client-obtains-authorizatio" class="internal xref">Client obtains authorization details object from resource server's error response</a></p>
 </li>
             </ul>
 </li>
@@ -1271,8 +1271,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
           <p id="section-1-5.3.1">A standardized error signaling mechanism allowing resource servers to return an authorization details object, to be included in a new Auth request, in order to accomplish a specific request.<a href="#section-1-5.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-1-6">It is up to implementers to decide if their clients need to learn to construct valid authorization details objects, and if so whether authorization details types metadata should be provided by authorization servers or by resource servers.<a href="#section-1-6" class="pilcrow">¶</a></p>
-<p id="section-1-7">Alternatively they may decide clients do not need to learn to construct valid authorization details objects, and interoperability shall be achieved by resource servers providing required authorization_details in their error signals, which clients then include in subsequent OAuth requests.<a href="#section-1-7" class="pilcrow">¶</a></p>
+<p id="section-1-6">It is up to implementers to decide if their clients <span class="bcp14">MUST</span> learn to construct valid authorization details objects, and if so whether authorization details types metadata should be provided by authorization servers, resource servers or both.<a href="#section-1-6" class="pilcrow">¶</a></p>
+<p id="section-1-7">It is also possible to relieve clients from the need to learn how to construct valid authorization details objects, instead providing them the required authorization_details objects in resource servers' error responses. Clients then include the provided authorization details objects in subsequent OAuth requests.<a href="#section-1-7" class="pilcrow">¶</a></p>
+<p id="section-1-8">The latter option is especially useful as it enables resource servers to include ephemeral, single-use details in the authorization details object which are part of the resource domain, such as a risk score, risk profile or an internal interaction identifier.<a href="#section-1-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1297,13 +1298,13 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
           <p id="section-3-2.1.1">Client learns to construct valid authorization details objects from authorization details types metadata provided by authorization servers, resource servers or both.<a href="#section-3-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-3-2.2">
-          <p id="section-3-2.2.1">Resource servers provide clients as part of an error response, the precise authorization details object, whose inclusion in subsequent OAuth requests is required to accomplish a specific request.<a href="#section-3-2.2.1" class="pilcrow">¶</a></p>
+          <p id="section-3-2.2.1">Client obtains authorization details object from resource server's error response, providing an authorization details object, whose inclusion in subsequent OAuth requests is required to accomplish a specific request.<a href="#section-3-2.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<div id="client-obtains-authorization-details-type-metadata">
+<div id="client-learns-to-construct-valid-authorization-details-objects-from-metadata">
 <section id="section-3.1">
-        <h3 id="name-client-obtains-authorizatio">
-<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-client-obtains-authorizatio" class="section-name selfRef">Client obtains authorization details type metadata</a>
+        <h3 id="name-client-learns-to-construct-">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-client-learns-to-construct-" class="section-name selfRef">Client learns to construct valid authorization details objects from metadata</a>
         </h3>
 <div class="alignLeft art-ascii-art art-text artwork" id="section-3.1-1">
 <pre>
@@ -1343,7 +1344,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
              +----------+
 </pre><a href="#section-3.1-1" class="pilcrow">¶</a>
 </div>
-<p id="section-3.1-2">Figure: Client obtains authorization details type metadata<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">Figure: Client learns to construct valid authorization details objects from metadata<a href="#section-3.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-3.1">
             <p id="section-3.1-3.1.1">(A) The user starts the flow.<a href="#section-3.1-3.1.1" class="pilcrow">¶</a></p>
@@ -1369,16 +1370,16 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         </ul>
 </section>
 </div>
-<div id="client-obtains-authorization-details-object">
+<div id="client-obtains-authorization-details-object-from-resource-servers-error-response">
 <section id="section-3.2">
-        <h3 id="name-client-obtains-authorization">
-<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-client-obtains-authorization" class="section-name selfRef">Client obtains authorization details object</a>
+        <h3 id="name-client-obtains-authorizatio">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-client-obtains-authorizatio" class="section-name selfRef">Client obtains authorization details object from resource server's error response</a>
         </h3>
 <div class="alignLeft art-text artwork" id="section-3.2-1">
 <pre>
                                             +--------------------+
          +----------+ (B) API Request               |                    |
-                     |                      |----------------------&gt;|          Resource      | (A) User +---|          |                       |       Server       |    Starts|   |          |&lt;----------------------|                    |    Flow  +--&gt;|  Client  | (C) 403 Forbidden     +--------------------+
+         |          |----------------------&gt;|          Resource      | (A) User +---|          |                       |       Server       |    Starts|   |          |&lt;----------------------|                    |    Flow  +--&gt;|  Client  | (C) 403 Forbidden     +--------------------+
          |          |     WWW-Authenticate
          |          |     error="insufficient_authorization_details"
          |          |     + authorization_details
@@ -1399,7 +1400,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
          |          |&lt;----------------------||                  ||
          |          | (H) Access Token      |+------------------+|
          |          |        :              +--------------------+
-                     |          |        :
+         |          |        :
          |          |        :
          |          | (I) Retry API Call    +--------------------+
          |          |     with Token        |                    |
@@ -1408,7 +1409,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
          |          |&lt;----------------------|                    |
          |          | (J) 200 OK + Resource +--------------------+
          |          |
-         +----------+ ~~~ Figure: Client obtains authorization details object
+         +----------+ ~~~ Figure: Client obtains authorization details object from resource server's error response
 </pre><a href="#section-3.2-1" class="pilcrow">¶</a>
 </div>
 <ul class="normal">

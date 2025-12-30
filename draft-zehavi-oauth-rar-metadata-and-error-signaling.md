@@ -190,7 +190,9 @@ Figure: Client obtains authorization details object from resource server's error
 
 This document defines a new metadata attribute, `authorization_details_types_metadata`, which provides documentation and validation information for authorization details types used with Rich Authorization Requests {{RFC9396}}.
 
-The metadata MAY be published by OAuth authorization servers using Authorization Server Metadata {{RFC8414}} as well as by Resource Servers using Protected Resource Metadata {{RFC9728}}.
+The new metadata property MAY be published by OAuth authorization servers using Authorization Server Metadata {{RFC8414}} as well as by Resource Servers using Protected Resource Metadata {{RFC9728}}.
+
+This document also proposes the existing `authorization_details_types_supported` metadata attributed defined by RAR {{RFC9396}}, be included in Protected Resource Metadata {{RFC9728}}.
 
 Clients MAY use this metadata to dynamically construct valid `authorization_details` objects.
 

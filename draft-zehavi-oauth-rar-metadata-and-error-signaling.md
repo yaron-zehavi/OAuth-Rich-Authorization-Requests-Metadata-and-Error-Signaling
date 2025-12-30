@@ -87,10 +87,10 @@ There are two main proposed flows, which may be combined:
 
 ~~~ ascii-art
                                                 +--------------------+
-												|  Authorization or  |
+                                                |  Authorization or  |
              +----------+ (B) Metadata Request  |  Resource Server   |
 (A) User +---|          |---------------------->|+------------------+|
-   Starts|   |          |						||    Metadata      ||
+   Starts|   |          |                       ||    Metadata      ||
    Flow  +-->|  Client  |<----------------------||    Endpoint      ||
              |          | (C) Metadata Response |+------------------+|
              |          |        :              +--------------------+
@@ -103,14 +103,14 @@ There are two main proposed flows, which may be combined:
              |          |                       ||   Authorization  ||
              |          |<----------------------||   Endpoint       ||
              |          | (F) Authorization Code|+------------------+|
-             |          |        :				|					 |
-             |          |        :              |					 |
-             |          | (G) Token Request     |					 |
+             |          |        :              |                    |
+             |          |        :              |                    |
+             |          | (G) Token Request     |                    |
              |          |---------------------->|+------------------+|
              |          |                       || Token Endpoint   ||
              |          |<----------------------||                  ||
              |          | (H) Access Token      |+------------------+|
-             |          |        :				+--------------------+
+             |          |        :              +--------------------+
              |          |        :
              |          | (I) API Call with
              |          |     Access Token      +--------------------+

@@ -100,13 +100,13 @@ There are two main proposed flows, which may be combined:
              |          | (E) Authorization     |   Authorization    |
              |          |     Request + RAR     |      Server        |
              |          |---------------------->|+------------------+|
-             |          |                       ||   Authorization  ||
-             |          |<----------------------||   Endpoint       ||
-             |          | (F) Authorization Code|+------------------+|
+             |          |                       ||  Authorization   ||
+             |          |<----------------------||    Endpoint      ||
+             |          | (F) Authorization Code||                  ||
+             |          |        :              |+------------------+|
              |          |        :              |                    |
-             |          |        :              |                    |
-             |          | (G) Token Request     |                    |
-             |          |---------------------->|+------------------+|
+             |          | (G) Token Request     |+------------------+|
+             |          |---------------------->||                  ||
              |          |                       || Token Endpoint   ||
              |          |<----------------------||                  ||
              |          | (H) Access Token      |+------------------+|
@@ -121,7 +121,7 @@ There are two main proposed flows, which may be combined:
              |          |
              +----------+
 ~~~
-Figure: Native client federated, then redirected to app
+Figure: Client obtains authorization details type metadata
 
 - (A) The user starts the flow.
 - (B-C) The client discovers authorization details type metadata from Authorization Server Metadata {{RFC8414}}, or from resource server Protected Resource Metadata {{RFC9728}}
@@ -129,11 +129,57 @@ Figure: Native client federated, then redirected to app
 - (F) Authorization server returns authorization code.
 - (G-H) The client exchanges authorization code for access token.
 - (I) The client makes API request with access token.
-- (J) Resource server validates access token and returns response.
+- (J) Resource server validates access token and returns successful response.
 
 ## Client obtains authorization details object
 
-Here comes another drawing.
+                                                +--------------------+
+             +----------+ (B) API Request		|                    |
+			 |			|---------------------->|	   Resource      |
+(A) User +---|          |                       |       Server       |
+   Starts|   |          |<----------------------|                    |
+   Flow  +-->|  Client  | (C) 403 Forbidden     +--------------------+
+             |          |     WWW-Authenticate
+             |          |     error="insufficient_authorization_details"
+             |          |     + authorization_details
+             |          |        :
+             |          |        :              +--------------------+
+             |          | (D) Authorization     |   Authorization    |
+             |          |     Request + RAR     |      Server        |
+             |          |---------------------->|+------------------+|
+             |          |                       ||                  ||
+             |          |<----------------------||  Authorization   ||
+             |          | (E) Authorization Code||    Endpoint      ||
+             |          |        :              ||                  ||
+             |          |        :              |+------------------+|
+             |          |        :              |                    |
+             |          | (G) Token Request     |+------------------+|
+             |          |---------------------->||                  ||
+             |          |                       || Token Endpoint   ||
+             |          |<----------------------||                  ||
+             |          | (H) Access Token      |+------------------+|
+             |          |        :              +--------------------+
+			 |          |        :
+             |          |        :
+             |          | (I) Retry API Call    +--------------------+
+             |          |     with Token        |                    |
+             |          |---------------------->|      Resource      |
+             |          |                       |       Server       |
+             |          |<----------------------|                    |
+             |          | (J) 200 OK + Resource +--------------------+
+             |          |
+             +----------+
+~~~
+Figure: Client obtains authorization details object
+
+- (A) The user starts the flow.
+- (B) The client calls an API with an access token.
+- (C) Resource server returns HTTP 403 forbidden because the access token does not contain required authorization details. Resource server's response includes a WWW-Authenticate header with the authorization details object requiring approval.
+- (D) The client uses the obtained authorization details object in a new OAuth + RAR {{RFC9396}} request.
+- (E) Authorization server returns authorization code.
+- (G-H) The client exchanges authorization code for access token.
+- (I) The client makes API request with access token.
+- (J) Resource server validates access token and returns successful response.
 
 # Authorization Details Type Metadata
 
@@ -191,7 +237,7 @@ The `authorization_details_types_metadata` attribute is a JSON object whose keys
 
 ## Metadata Examples
 
-### Example Authorization Server RAR Metadata: Payment Initiation
+### Example RAR Metadata: Payment Initiation
 
     {
         "authorization_details_types_supported": ["payment_initiation"],

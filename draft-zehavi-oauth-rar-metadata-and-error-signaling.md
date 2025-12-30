@@ -83,59 +83,54 @@ There are two main proposed flows, which may be combined:
 * Client learns to construct valid authorization details objects from authorization details types metadata provided by authorization servers, resource servers or both.
 * Resource servers provide clients as part of an error response, the precise authorization details object, whose inclusion in subsequent OAuth requests is required to accomplish a specific request.
 
-## Client obtains authorization details types metadata
+## Client obtains authorization details type metadata
 
 ~~~ ascii-art
                                                 +--------------------+
-                                                |   Authorization    |
-                          (B)Native             |      Server 1      |
-             +----------+ Authorization Request |+------------------+|
-(A)User  +---|          |---------------------->||     Native       ||
-   Starts|   |          |                       ||  Authorization   ||
-   Flow  +-->|  Client  |<----------------------||    Endpoint      ||
-             |          | (C)Federate Error     |+------------------+|
-             |          |        Response       +--------------------+
-             |          |         :
-             |          |         :             +--------------------+
-             |          |         :             |   Authorization    |
-             |          | (D)Native             |      Server 2      |
-             |          | Authorization Request |+------------------+|
-             |          |---------------------->||     Native       ||
-             |          |                       ||  Authorization   ||
-             |          |<----------------------||    Endpoint      ||
-             |          | (E) Redirect to       |+------------------+|
-             |          |     App Response      +--------------------+
-             |          |         :
-             |          |         :             +--------------------+
-             |          | (F) Invoke App        |                    |
-             |          |---------------------->|   Native App of    |
-             |          |                       |   Auth Server 2    |
-             |          |<----------------------|                    |
-             |          | (G)Authorization code +--------------------+
-             |          |   For Auth Server 1
-             |          |         :             +--------------------+
-             |          |         :             |   Authorization    |
-             |          | (H)Authorization Code |      Server 1      |
-             |          |    For Auth Server 1  |+------------------+|
-             |          |---------------------->||    Response      ||
-             |          |                       ||       Uri        ||
-             |          |<----------------------||    Endpoint      ||
-             |          | (I) Authorization     |+------------------+|
-             |          |     Code Response     |                    |
-             |          |         :             |                    |
-             |          |         :             |                    |
-             |          | (J) Token Request     |+------------------+|
-             |          |---------------------->||      Token       ||
-             |          |                       ||     Endpoint     ||
+                                                |   Authorization /  |
+												|   Resource Server  |
+             +----------+ (B) Metadata Request  |+------------------+|
+(A) User +---|          |---------------------->||  Metadata /      ||
+   Starts|   |          |						||  Discovery       ||
+   Flow  +-->|  Client  |<----------------------||  Endpoint        ||
+             |          | (C) Metadata Response |+------------------+|
+             |          |        :              +--------------------+
+             |          | (D) Construct RAR
+             |          |     Using Metadata
+             |          |        :              +--------------------+
+             |          | (E) Authorization     |   Authorization    |
+             |          |     Request + RAR     |      Server        |
+             |          |---------------------->|+------------------+|
+             |          |                       || Authorization    ||
+             |          |<----------------------|| Endpoint         ||
+             |          | (F) Authorization Code|+------------------+|
+             |          |        :				|					 |
+             |          |        :              |					 |
+             |          | (G) Token Request     |					 |
+             |          |---------------------->|+------------------+|
+             |          |                       || Token Endpoint   ||
              |          |<----------------------||                  ||
-             |          | (K) Access Token      |+------------------+|
-             |          |                       +--------------------+
+             |          | (H) Access Token      |+------------------+|
+             |          |        :				+--------------------+
+             |          |        :
+             |          | (I) API Call with     +--------------------+
+             |          |     Access Token      |                    |
+             |          |---------------------->|   Resource         |
+             |          |                       |     Server         |
+             |          |<----------------------|                    |
+             |          | (J) 200 OK + Resource +--------------------+
              |          |
              +----------+
 ~~~
 Figure: Native client federated, then redirected to app
 
-- (A) The client starts the flow.
+- (A) The user starts the flow.
+- (B-C) The client discovers authorization details type metadata from Authorization Server Metadata {{RFC8414}}, or from resource server Protected Resource Metadata {{RFC9728}}
+- (D-E) The client constructs a valid authorization details object and makes an OAuth + RAR {{RFC9396}} request.
+- (F) Authorization server returns authorization code.
+- (G-H) The client exchanges authorization code for access token.
+- (I) The client makes API request with access token.
+- (J) Resource server validates access token and returns response.
 
 ## Client obtains authorization details object
 
@@ -147,7 +142,7 @@ Here comes another drawing.
 
 This document defines a new metadata attribute, `authorization_details_types_metadata`, which provides documentation and validation information for authorization details types used with Rich Authorization Requests {{RFC9396}}.
 
-The metadata MAY be published by OAuth Authorization Servers using Authorization Server Metadata {{RFC8414}} as well as by OAuth Resource Servers using Resource Server Metadata {{RFC9728}}.
+The metadata MAY be published by OAuth authorization servers using Authorization Server Metadata {{RFC8414}} as well as by Resource Servers using Protected Resource Metadata {{RFC9728}}.
 
 Clients MAY use this metadata to dynamically construct valid `authorization_details` objects.
 
@@ -323,23 +318,11 @@ The value MUST be base64url-encoded.
 
 | Error Code | Description |
 |------------|-------------|
-| insufficient_authorization_details | The request is missing required authorization details or the provided authorization details are insufficient. The RS MAY include `authorization_details` describing required details. |
+| insufficient_authorization_details | The request is missing required authorization details or the provided authorization details are insufficient. The resource server MAY include `authorization_details` describing required details. |
 
 ## OAuth Metadata Attribute Registration
 
 The metadata attribute `authorization_details_types_metadata` is defined for OAuth authorization and resource server metadata, as a JSON object mapping authorization details types to documentation, schema, and examples.
-
-## OAuth Parameters Registration
-
-IANA has (TBD) registered the following values in the IANA "OAuth Parameters" registry of {{IANA.oauth-parameters}} established by {{RFC6749}}.
-
-**Parameter name**: `native_callback_uri`
-
-**Parameter usage location**: Native Authorization Endpoint
-
-**Change Controller**: IETF
-
-**Specification Document**: Section 5.4 of this specification
 
 --- back
 

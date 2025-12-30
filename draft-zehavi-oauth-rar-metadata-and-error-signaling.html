@@ -1388,13 +1388,13 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
              |          |     + authorization_details
              |          |        :
              |          |        :              +--------------------+
-             |          | (D) Authorization     |   Authorization    |
-             |          |     Request + RAR     |      Server        |
-             |          |----------------------&gt;|+------------------+|
-             |          |                       ||                  ||
-             |          |&lt;----------------------||  Authorization   ||
-             |          | (E) Authorization Code||    Endpoint      ||
-             |          |        :              ||                  ||
+             |          |        :              |   Authorization    |
+             |          | (D) Authorization     |      Server        |
+             |          |     Request + RAR     |+------------------+|
+             |          |----------------------&gt;||                  ||
+             |          |                       ||  Authorization   ||
+             |          |&lt;----------------------||    Endpoint      ||
+             |          | (E) Authorization Code||                  ||
              |          |        :              |+------------------+|
              |          |        :              |                    |
              |          | (G) Token Request     |+------------------+|

@@ -147,13 +147,13 @@ Figure: Client learns to construct valid authorization details objects from meta
              |          |     + authorization_details
              |          |        :
              |          |        :              +--------------------+
-             |          | (D) Authorization     |   Authorization    |
-             |          |     Request + RAR     |      Server        |
-             |          |---------------------->|+------------------+|
-             |          |                       ||                  ||
-             |          |<----------------------||  Authorization   ||
-             |          | (E) Authorization Code||    Endpoint      ||
-             |          |        :              ||                  ||
+             |          |        :              |   Authorization    |
+             |          | (D) Authorization     |      Server        |
+             |          |     Request + RAR     |+------------------+|
+             |          |---------------------->||                  ||
+             |          |                       ||  Authorization   ||
+             |          |<----------------------||    Endpoint      ||
+             |          | (E) Authorization Code||                  ||
              |          |        :              |+------------------+|
              |          |        :              |                    |
              |          | (G) Token Request     |+------------------+|

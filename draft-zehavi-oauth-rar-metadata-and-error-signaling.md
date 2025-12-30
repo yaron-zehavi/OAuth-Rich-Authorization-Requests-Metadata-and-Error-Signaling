@@ -68,9 +68,11 @@ This document addresses this gap by defining:
 * Discovery through Authorization Server Metadata {{RFC8414}}, as well as via OAuth 2.0 Protected Resource Metadata {{RFC9728}}.
 * A standardized error signaling mechanism allowing resource servers to return an authorization details object, to be included in a new Auth request, in order to accomplish a specific request.
 
-It is up to implementers to decide if their clients need to learn to construct valid authorization details objects, and if so whether authorization details types metadata should be provided by authorization servers or by resource servers.
+It is up to implementers to decide if their clients MUST learn to construct valid authorization details objects, and if so whether authorization details types metadata should be provided by authorization servers, resource servers or both.
 
-Alternatively they may decide clients do not need to learn to construct valid authorization details objects, and interoperability shall be achieved by resource servers providing required authorization_details in their error signals, which clients then include in subsequent OAuth requests.
+It is also possible to relieve clients from the need to learn how to construct valid authorization details objects, instead providing them the required authorization_details objects in resource servers' error responses. Clients then include the provided authorization details objects in subsequent OAuth requests.
+
+The latter option is especially useful as it enables resource servers to include ephemeral, single-use details in the authorization details object which are part of the resource domain, such as a risk score, risk profile or an internal interaction identifier.
 
 # Conventions and Definitions
 
@@ -81,9 +83,9 @@ Alternatively they may decide clients do not need to learn to construct valid au
 There are two main proposed flows, which may be combined:
 
 * Client learns to construct valid authorization details objects from authorization details types metadata provided by authorization servers, resource servers or both.
-* Resource servers provide clients as part of an error response, the precise authorization details object, whose inclusion in subsequent OAuth requests is required to accomplish a specific request.
+* Client obtains authorization details object from resource server's error response, providing an authorization details object, whose inclusion in subsequent OAuth requests is required to accomplish a specific request.
 
-## Client obtains authorization details type metadata
+## Client learns to construct valid authorization details objects from metadata
 
 ~~~ ascii-art
                                                 +--------------------+
@@ -121,7 +123,7 @@ There are two main proposed flows, which may be combined:
              |          |
              +----------+
 ~~~
-Figure: Client obtains authorization details type metadata
+Figure: Client learns to construct valid authorization details objects from metadata
 
 - (A) The user starts the flow.
 - (B-C) The client discovers authorization details type metadata from Authorization Server Metadata {{RFC8414}}, or from resource server Protected Resource Metadata {{RFC9728}}
@@ -131,11 +133,11 @@ Figure: Client obtains authorization details type metadata
 - (I) The client makes API request with access token.
 - (J) Resource server validates access token and returns successful response.
 
-## Client obtains authorization details object
+## Client obtains authorization details object from resource server's error response
 
                                                 +--------------------+
              +----------+ (B) API Request		|                    |
-			 |			|---------------------->|	   Resource      |
+             |          |---------------------->|	   Resource      |
 (A) User +---|          |                       |       Server       |
    Starts|   |          |<----------------------|                    |
    Flow  +-->|  Client  | (C) 403 Forbidden     +--------------------+
@@ -159,7 +161,7 @@ Figure: Client obtains authorization details type metadata
              |          |<----------------------||                  ||
              |          | (H) Access Token      |+------------------+|
              |          |        :              +--------------------+
-			 |          |        :
+             |          |        :
              |          |        :
              |          | (I) Retry API Call    +--------------------+
              |          |     with Token        |                    |
@@ -170,7 +172,7 @@ Figure: Client obtains authorization details type metadata
              |          |
              +----------+
 ~~~
-Figure: Client obtains authorization details object
+Figure: Client obtains authorization details object from resource server's error response
 
 - (A) The user starts the flow.
 - (B) The client calls an API with an access token.

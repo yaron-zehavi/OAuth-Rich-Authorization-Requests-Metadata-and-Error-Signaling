@@ -1308,12 +1308,11 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <div class="alignLeft art-ascii-art art-text artwork" id="section-3.1-1">
 <pre>
                                                 +--------------------+
-                                                |   Authorization /  |
-                                                                                                |   Resource Server  |
-             +----------+ (B) Metadata Request  |+------------------+|
-(A) User +---|          |----------------------&gt;||  Metadata /      ||
-   Starts|   |          |                                               ||  Discovery       ||
-   Flow  +--&gt;|  Client  |&lt;----------------------||  Endpoint        ||
+                                                                                                |  Authorization or  |
+             +----------+ (B) Metadata Request  |  Resource Server   |
+(A) User +---|          |----------------------&gt;|+------------------+|
+   Starts|   |          |                                               ||    Metadata      ||
+   Flow  +--&gt;|  Client  |&lt;----------------------||    Endpoint      ||
              |          | (C) Metadata Response |+------------------+|
              |          |        :              +--------------------+
              |          | (D) Construct RAR
@@ -1322,8 +1321,8 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
              |          | (E) Authorization     |   Authorization    |
              |          |     Request + RAR     |      Server        |
              |          |----------------------&gt;|+------------------+|
-             |          |                       || Authorization    ||
-             |          |&lt;----------------------|| Endpoint         ||
+             |          |                       ||   Authorization  ||
+             |          |&lt;----------------------||   Endpoint       ||
              |          | (F) Authorization Code|+------------------+|
              |          |        :                              |                                        |
              |          |        :              |                                        |
@@ -1334,10 +1333,10 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
              |          | (H) Access Token      |+------------------+|
              |          |        :                              +--------------------+
              |          |        :
-             |          | (I) API Call with     +--------------------+
-             |          |     Access Token      |                    |
-             |          |----------------------&gt;|   Resource         |
-             |          |                       |     Server         |
+             |          | (I) API Call with
+             |          |     Access Token      +--------------------+
+             |          |----------------------&gt;|                    |
+             |          |                       |   Resource Server  |
              |          |&lt;----------------------|                    |
              |          | (J) 200 OK + Resource +--------------------+
              |          |

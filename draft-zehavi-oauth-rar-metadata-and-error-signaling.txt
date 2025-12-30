@@ -177,40 +177,40 @@ Table of Contents
 
 3.1.  Client obtains authorization details type metadata
 
-                                                +--------------------+
-                                                                                                |  Authorization or  |
-             +----------+ (B) Metadata Request  |  Resource Server   |
-(A) User +---|          |---------------------->|+------------------+|
-   Starts|   |          |                                               ||    Metadata      ||
-   Flow  +-->|  Client  |<----------------------||    Endpoint      ||
-             |          | (C) Metadata Response |+------------------+|
-             |          |        :              +--------------------+
-             |          | (D) Construct RAR
-             |          |     Using Metadata
-             |          |        :              +--------------------+
-             |          | (E) Authorization     |   Authorization    |
-             |          |     Request + RAR     |      Server        |
-             |          |---------------------->|+------------------+|
-             |          |                       ||   Authorization  ||
-             |          |<----------------------||   Endpoint       ||
-             |          | (F) Authorization Code|+------------------+|
-             |          |        :                              |                                        |
-             |          |        :              |                                        |
-             |          | (G) Token Request     |                                        |
-             |          |---------------------->|+------------------+|
-             |          |                       || Token Endpoint   ||
-             |          |<----------------------||                  ||
-             |          | (H) Access Token      |+------------------+|
-             |          |        :                              +--------------------+
-             |          |        :
-             |          | (I) API Call with
-             |          |     Access Token      +--------------------+
-             |          |---------------------->|                    |
-             |          |                       |   Resource Server  |
-             |          |<----------------------|                    |
-             |          | (J) 200 OK + Resource +--------------------+
-             |          |
-             +----------+
+                                                  +--------------------+
+                                                  |  Authorization or  |
+               +----------+ (B) Metadata Request  |  Resource Server   |
+  (A) User +---|          |---------------------->|+------------------+|
+     Starts|   |          |                       ||    Metadata      ||
+     Flow  +-->|  Client  |<----------------------||    Endpoint      ||
+               |          | (C) Metadata Response |+------------------+|
+               |          |        :              +--------------------+
+               |          | (D) Construct RAR
+               |          |     Using Metadata
+               |          |        :              +--------------------+
+               |          | (E) Authorization     |   Authorization    |
+               |          |     Request + RAR     |      Server        |
+               |          |---------------------->|+------------------+|
+               |          |                       ||   Authorization  ||
+               |          |<----------------------||   Endpoint       ||
+               |          | (F) Authorization Code|+------------------+|
+               |          |        :              |                    |
+               |          |        :              |                    |
+               |          | (G) Token Request     |                    |
+               |          |---------------------->|+------------------+|
+               |          |                       || Token Endpoint   ||
+               |          |<----------------------||                  ||
+               |          | (H) Access Token      |+------------------+|
+               |          |        :              +--------------------+
+               |          |        :
+               |          | (I) API Call with
+               |          |     Access Token      +--------------------+
+               |          |---------------------->|                    |
+               |          |                       |   Resource Server  |
+               |          |<----------------------|                    |
+               |          | (J) 200 OK + Resource +--------------------+
+               |          |
+               +----------+
 
    Figure: Native client federated, then redirected to app
 

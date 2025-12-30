@@ -1308,10 +1308,10 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <div class="alignLeft art-ascii-art art-text artwork" id="section-3.1-1">
 <pre>
                                                 +--------------------+
-                                                                                                |  Authorization or  |
+                                                |  Authorization or  |
              +----------+ (B) Metadata Request  |  Resource Server   |
 (A) User +---|          |----------------------&gt;|+------------------+|
-   Starts|   |          |                                               ||    Metadata      ||
+   Starts|   |          |                       ||    Metadata      ||
    Flow  +--&gt;|  Client  |&lt;----------------------||    Endpoint      ||
              |          | (C) Metadata Response |+------------------+|
              |          |        :              +--------------------+
@@ -1324,14 +1324,14 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
              |          |                       ||   Authorization  ||
              |          |&lt;----------------------||   Endpoint       ||
              |          | (F) Authorization Code|+------------------+|
-             |          |        :                              |                                        |
-             |          |        :              |                                        |
-             |          | (G) Token Request     |                                        |
+             |          |        :              |                    |
+             |          |        :              |                    |
+             |          | (G) Token Request     |                    |
              |          |----------------------&gt;|+------------------+|
              |          |                       || Token Endpoint   ||
              |          |&lt;----------------------||                  ||
              |          | (H) Access Token      |+------------------+|
-             |          |        :                              +--------------------+
+             |          |        :              +--------------------+
              |          |        :
              |          | (I) API Call with
              |          |     Access Token      +--------------------+

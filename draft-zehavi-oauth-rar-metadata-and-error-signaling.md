@@ -80,7 +80,7 @@ The latter option is especially useful as it enables resource servers to include
 
 # Protocol Overview
 
-There are two main proposed flows, which may be combined:
+There are two main proposed flows, either of them or both may be offered in parallel:
 
 * Client learns to construct valid authorization details objects from authorization details types metadata provided by authorization servers, resource servers or both.
 * Client obtains authorization details object from resource server's error response, providing an authorization details object, whose inclusion in subsequent OAuth requests is required to accomplish a specific request.
@@ -136,8 +136,8 @@ Figure: Client learns to construct valid authorization details objects from meta
 ## Client obtains authorization details object from resource server's error response
 
                                                 +--------------------+
-             +----------+ (B) API Request		|                    |
-             |          |---------------------->|	   Resource      |
+             +----------+ (B) API Request       |                    |
+             |          |---------------------->|      Resource      |
 (A) User +---|          |                       |       Server       |
    Starts|   |          |<----------------------|                    |
    Flow  +-->|  Client  | (C) 403 Forbidden     +--------------------+

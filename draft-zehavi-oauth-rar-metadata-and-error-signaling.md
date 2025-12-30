@@ -135,6 +135,7 @@ Figure: Client learns to construct valid authorization details objects from meta
 
 ## Client obtains authorization details object from resource server's error response
 
+~~~ ascii-art
                                                 +--------------------+
              +----------+ (B) API Request       |                    |
              |          |---------------------->|      Resource      |
@@ -142,8 +143,8 @@ Figure: Client learns to construct valid authorization details objects from meta
    Starts|   |          |<----------------------|                    |
    Flow  +-->|  Client  | (C) 403 Forbidden     +--------------------+
              |          |     WWW-Authenticate
-             |          |   error="insufficient_authorization_details"
-             |          |   + authorization_details
+             |          |     error="insufficient_authorization_details"
+             |          |     + authorization_details
              |          |        :
              |          |        :              +--------------------+
              |          | (D) Authorization     |   Authorization    |

@@ -87,12 +87,11 @@ There are two main proposed flows, which may be combined:
 
 ~~~ ascii-art
                                                 +--------------------+
-                                                |   Authorization /  |
-												|   Resource Server  |
-             +----------+ (B) Metadata Request  |+------------------+|
-(A) User +---|          |---------------------->||  Metadata /      ||
-   Starts|   |          |						||  Discovery       ||
-   Flow  +-->|  Client  |<----------------------||  Endpoint        ||
+												|  Authorization or  |
+             +----------+ (B) Metadata Request  |  Resource Server   |
+(A) User +---|          |---------------------->|+------------------+|
+   Starts|   |          |						||    Metadata      ||
+   Flow  +-->|  Client  |<----------------------||    Endpoint      ||
              |          | (C) Metadata Response |+------------------+|
              |          |        :              +--------------------+
              |          | (D) Construct RAR
@@ -101,8 +100,8 @@ There are two main proposed flows, which may be combined:
              |          | (E) Authorization     |   Authorization    |
              |          |     Request + RAR     |      Server        |
              |          |---------------------->|+------------------+|
-             |          |                       || Authorization    ||
-             |          |<----------------------|| Endpoint         ||
+             |          |                       ||   Authorization  ||
+             |          |<----------------------||   Endpoint       ||
              |          | (F) Authorization Code|+------------------+|
              |          |        :				|					 |
              |          |        :              |					 |
@@ -113,10 +112,10 @@ There are two main proposed flows, which may be combined:
              |          | (H) Access Token      |+------------------+|
              |          |        :				+--------------------+
              |          |        :
-             |          | (I) API Call with     +--------------------+
-             |          |     Access Token      |                    |
-             |          |---------------------->|   Resource         |
-             |          |                       |     Server         |
+             |          | (I) API Call with
+             |          |     Access Token      +--------------------+
+             |          |---------------------->|                    |
+             |          |                       |   Resource Server  |
              |          |<----------------------|                    |
              |          | (J) 200 OK + Resource +--------------------+
              |          |

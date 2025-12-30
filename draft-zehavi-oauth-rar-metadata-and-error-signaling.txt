@@ -170,7 +170,8 @@ Table of Contents
 
 3.  Protocol Overview
 
-   There are two main proposed flows, which may be combined:
+   There are two main proposed flows, either of them or both may be
+   offered in parallel:
 
    *  Client learns to construct valid authorization details objects
       from authorization details types metadata provided by
@@ -244,8 +245,8 @@ Table of Contents
       error response
 
                                             +--------------------+
-         +----------+ (B) API Request               |                    |
-         |          |---------------------->|          Resource      | (A) User +---|          |                       |       Server       |    Starts|   |          |<----------------------|                    |    Flow  +-->|  Client  | (C) 403 Forbidden     +--------------------+
+         +----------+ (B) API Request       |                    |
+         |          |---------------------->|      Resource      | (A) User +---|          |                       |       Server       |    Starts|   |          |<----------------------|                    |    Flow  +-->|  Client  | (C) 403 Forbidden     +--------------------+
          |          |     WWW-Authenticate
          |          |     error="insufficient_authorization_details"
          |          |     + authorization_details

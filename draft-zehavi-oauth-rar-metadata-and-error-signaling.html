@@ -1292,7 +1292,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
       <h2 id="name-protocol-overview">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-protocol-overview" class="section-name selfRef">Protocol Overview</a>
       </h2>
-<p id="section-3-1">There are two main proposed flows, which may be combined:<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-1">There are two main proposed flows, either of them or both may be offered in parallel:<a href="#section-3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3-2.1">
           <p id="section-3-2.1.1">Client learns to construct valid authorization details objects from authorization details types metadata provided by authorization servers, resource servers or both.<a href="#section-3-2.1.1" class="pilcrow">¶</a></p>
@@ -1378,8 +1378,8 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <div class="alignLeft art-text artwork" id="section-3.2-1">
 <pre>
                                             +--------------------+
-         +----------+ (B) API Request               |                    |
-         |          |----------------------&gt;|          Resource      | (A) User +---|          |                       |       Server       |    Starts|   |          |&lt;----------------------|                    |    Flow  +--&gt;|  Client  | (C) 403 Forbidden     +--------------------+
+         +----------+ (B) API Request       |                    |
+         |          |----------------------&gt;|      Resource      | (A) User +---|          |                       |       Server       |    Starts|   |          |&lt;----------------------|                    |    Flow  +--&gt;|  Client  | (C) 403 Forbidden     +--------------------+
          |          |     WWW-Authenticate
          |          |     error="insufficient_authorization_details"
          |          |     + authorization_details

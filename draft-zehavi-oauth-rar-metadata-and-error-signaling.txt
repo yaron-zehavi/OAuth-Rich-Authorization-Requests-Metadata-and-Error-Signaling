@@ -4,8 +4,8 @@
 
 Web Authorization Protocol                                     Y. Zehavi
 Internet-Draft                             Raiffeisen Bank International
-Intended status: Standards Track                        30 December 2025
-Expires: 3 July 2026
+Intended status: Standards Track                        31 December 2025
+Expires: 4 July 2026
 
 
                OAuth 2.0 RAR Metadata and Error Signaling
@@ -23,10 +23,11 @@ Abstract
    This document defines a machine-readable metadata structure for
    advertising authorization details type documentation and JSON Schema
    [JSON.Schema] definitions via OAuth Authorization Server Metadata
-   [RFC8414] and OAuth Resource Server Metadata [RFC9728].  In addition,
-   this document defines a new OAuth error code,
+   [RFC8414] and OAuth Resource Server Metadata [RFC9728].
+
+   In addition, this document defines a new OAuth error code,
    insufficient_authorization_details, enabling resource servers to
-   return actionable authorization details information to clients.
+   return actionable authorization details objects to clients.
 
 About This Document
 
@@ -63,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 July 2026.
+   This Internet-Draft will expire on 4 July 2026.
 
 Copyright Notice
 
@@ -92,9 +93,8 @@ Table of Contents
      4.1.  Overview
      4.2.  Metadata Location
      4.3.  Metadata Structure
-     4.4.  Metadata Attributes
-     4.5.  Metadata Examples
-       4.5.1.  Example RAR Metadata: Payment Initiation
+     4.4.  Metadata Examples
+       4.4.1.  Example RAR Metadata: Payment Initiation
    5.  Resource Server Error Signaling with
            insufficient_authorization_details
      5.1.  Overview
@@ -116,12 +116,12 @@ Table of Contents
 
 1.  Introduction
 
-   OAuth 2.0 Rich Authorization Requests (RAR) [RFC9396] allow OAuth
-   clients to request structured, fine-grained authorization beyond
-   simple scopes.  This has enabled advanced authorization models across
-   domains such as open banking & API marketplaces, and is well
-   positioned to be used for authorizing AI agent state-changing
-   actions.
+   OAuth 2.0 Rich Authorization Requests (RAR) [RFC9396] allows OAuth
+   clients to request structured, fine-grained authorization, beyond the
+   coarse-grained access offered by simple scopes.  This has enabled
+   advanced authorization models across domains, such as open banking &
+   API marketplaces, and is well positioned for authorizing AI agents to
+   perform state-changing actions.
 
    However, RAR [RFC9396] does not specify how a client discovers the
    structure of supported authorization_detail types and how to
@@ -140,25 +140,26 @@ Table of Contents
    *  Discovery through Authorization Server Metadata [RFC8414], as well
       as via OAuth 2.0 Protected Resource Metadata [RFC9728].
 
-   *  A standardized error signaling mechanism allowing resource servers
-      to return an authorization details object, to be included in a new
-      Auth request, in order to accomplish a specific request.
+   *  A standardized error signaling mechanism, allowing resource
+      servers to return an authorization details object, to be included
+      in a new Auth request, in order to accomplish a specific request.
 
    It is up to implementers to decide if their clients MUST learn to
    construct valid authorization details objects, and if so whether
    authorization details types metadata should be provided by
    authorization servers, resource servers or both.
 
-   It is also possible to relieve clients from the need to learn how to
-   construct valid authorization details objects, instead providing them
-   the required authorization_details objects in resource servers' error
-   responses.  Clients then include the provided authorization details
-   objects in subsequent OAuth requests.
+   This document also outlines a solution pattern relieving clients from
+   having to learn how to construct valid authorization details objects,
+   instead providing clients the required authorization_details objects
+   in resource servers' error responses.  Clients then include the
+   provided authorization details objects in subsequent OAuth requests.
 
-   The latter option is especially useful as it enables resource servers
-   to include ephemeral, single-use details in the authorization details
-   object which are part of the resource domain, such as a risk score,
-   risk profile or an internal interaction identifier.
+   This latter option is especially useful, as it enables resource
+   servers to include ephemeral, interaction-specific details in the
+   authorization details object, which are part of the resource domain,
+   such as a risk score, risk profile or an internal interaction
+   identifier.
 
 2.  Conventions and Definitions
 
@@ -318,12 +319,12 @@ Table of Contents
    servers using Authorization Server Metadata [RFC8414] as well as by
    Resource Servers using Protected Resource Metadata [RFC9728].
 
+   Clients MAY use this metadata to dynamically construct valid
+   authorization_details objects.
+
    This document also proposes the existing
    authorization_details_types_supported metadata attributed defined by
    RAR [RFC9396], be included in Protected Resource Metadata [RFC9728].
-
-   Clients MAY use this metadata to dynamically construct valid
-   authorization_details objects.
 
 4.2.  Metadata Location
 
@@ -357,7 +358,7 @@ Table of Contents
    }
    }
 
-4.4.  Metadata Attributes
+   Attributes definition:
 
    "version":  OPTIONAL.  String identifying the version of the
       authorization details type definition.  The value is informational
@@ -388,9 +389,9 @@ Table of Contents
    "examples":  OPTIONAL.  An array of example authorization details
       objects.  Examples are non-normative.
 
-4.5.  Metadata Examples
+4.4.  Metadata Examples
 
-4.5.1.  Example RAR Metadata: Payment Initiation
+4.4.1.  Example RAR Metadata: Payment Initiation
 
 {
     "authorization_details_types_supported": ["payment_initiation"],

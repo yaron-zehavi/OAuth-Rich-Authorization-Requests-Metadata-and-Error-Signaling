@@ -50,13 +50,15 @@ normative:
 
 OAuth 2.0 Rich Authorization Requests (RAR), as defined in {{RFC9396}}, enables clients to request fine-grained authorization using structured JSON objects. While RAR {{RFC9396}} standardizes the exchange and handling of authorization details, it does not define a mechanism for clients to discover how to construct valid authorization details types.
 
-This document defines a machine-readable metadata structure for advertising authorization details type documentation and JSON Schema {{JSON.Schema}} definitions via OAuth Authorization Server Metadata {{RFC8414}} and OAuth Resource Server Metadata {{RFC9728}}. In addition, this document defines a new OAuth error code, `insufficient_authorization_details`, enabling resource servers to return actionable authorization details information to clients.
+This document defines a machine-readable metadata structure for advertising authorization details type documentation and JSON Schema {{JSON.Schema}} definitions via OAuth Authorization Server Metadata {{RFC8414}} and OAuth Resource Server Metadata {{RFC9728}}.
+
+In addition, this document defines a new OAuth error code, `insufficient_authorization_details`, enabling resource servers to return actionable authorization details objects to clients.
 
 --- middle
 
 # Introduction
 
-OAuth 2.0 Rich Authorization Requests (RAR) {{RFC9396}} allow OAuth clients to request structured, fine-grained authorization beyond simple scopes. This has enabled advanced authorization models across domains such as open banking & API marketplaces, and is well positioned to be used for authorizing AI agent state-changing actions.
+OAuth 2.0 Rich Authorization Requests (RAR) {{RFC9396}} allows OAuth clients to request structured, fine-grained authorization, beyond the coarse-grained access offered by simple scopes. This has enabled advanced authorization models across domains, such as open banking & API marketplaces, and is well positioned for authorizing AI agents to perform state-changing actions.
 
 However, RAR {{RFC9396}} does not specify how a client discovers the structure of supported authorization_detail types and how to construct syntactically valid authorization details.
 
@@ -66,13 +68,13 @@ This document addresses this gap by defining:
 
 * A metadata structure for authorization details types, containing both human-readable documentation as well as embedded JSON Schema {{JSON.Schema}} definitions.
 * Discovery through Authorization Server Metadata {{RFC8414}}, as well as via OAuth 2.0 Protected Resource Metadata {{RFC9728}}.
-* A standardized error signaling mechanism allowing resource servers to return an authorization details object, to be included in a new Auth request, in order to accomplish a specific request.
+* A standardized error signaling mechanism, allowing resource servers to return an authorization details object, to be included in a new Auth request, in order to accomplish a specific request.
 
 It is up to implementers to decide if their clients MUST learn to construct valid authorization details objects, and if so whether authorization details types metadata should be provided by authorization servers, resource servers or both.
 
-It is also possible to relieve clients from the need to learn how to construct valid authorization details objects, instead providing them the required authorization_details objects in resource servers' error responses. Clients then include the provided authorization details objects in subsequent OAuth requests.
+This document also outlines a solution pattern relieving clients from having to learn how to construct valid authorization details objects, instead providing clients the required authorization_details objects in resource servers' error responses. Clients then include the provided authorization details objects in subsequent OAuth requests.
 
-The latter option is especially useful as it enables resource servers to include ephemeral, single-use details in the authorization details object which are part of the resource domain, such as a risk score, risk profile or an internal interaction identifier.
+This latter option is especially useful, as it enables resource servers to include ephemeral, interaction-specific details in the authorization details object, which are part of the resource domain, such as a risk score, risk profile or an internal interaction identifier.
 
 # Conventions and Definitions
 

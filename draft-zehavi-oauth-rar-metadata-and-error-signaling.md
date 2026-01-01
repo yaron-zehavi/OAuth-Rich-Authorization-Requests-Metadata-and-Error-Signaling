@@ -85,7 +85,7 @@ This latter option is especially useful, as it enables resource servers to inclu
 There are two main proposed flows, either of them or both may be offered in parallel:
 
 * Client learns to construct valid authorization details objects from authorization details types metadata provided by authorization servers, resource servers or both.
-* Client obtains authorization details object from resource server's error response, providing an authorization details object, whose inclusion in subsequent OAuth requests is required to accomplish a specific request.
+* Client obtains authorization details object from resource server's error response, providing an actionable authorization details object, whose inclusion in subsequent OAuth requests is required to accomplish a specific request.
 
 ## Client learns to construct valid authorization details objects from metadata
 
@@ -337,7 +337,7 @@ The value MUST be base64url-encoded.
 
     HTTP/1.1 403 Forbidden
     WWW-Authenticate: Bearer error="insufficient_authorization_details",
-    authorization_details="{JSON or base64url-encoded JSON of required RAR}"
+    authorization_details="{base64url-encoded JSON of required RAR}"
 
 # Processing Rules
 
@@ -370,7 +370,7 @@ The value MUST be base64url-encoded.
 
 | Error Code | Description |
 |------------|-------------|
-| insufficient_authorization_details | The request is missing required authorization details or the provided authorization details are insufficient. The resource server MAY include `authorization_details` describing required details. |
+| insufficient_authorization_details | The request is missing required authorization details or the provided authorization details are insufficient. The resource server SHOULD include the required `authorization_details` |
 
 ## OAuth Metadata Attribute Registration
 
@@ -378,9 +378,105 @@ The metadata attribute `authorization_details_types_metadata` is defined for OAu
 
 --- back
 
-# Example User Experiences
+# Examples
 
 This section provides non-normative examples of how this specification may be used to support specific use cases.
+
+## Payment initiation with RAR error signaling
+
+### Client initiates API request
+
+Client uses access token obtained at login to call payment initiation API
+
+    POST /payments HTTP/1.1
+    Host: server.example.com
+    Content-Type: application/json
+    Authorization: Bearer eyj... (access token from login)
+
+    {
+        "type": "payment_initiation",
+        "locations": [
+            "https://server.example.com/payments"
+        ],
+        "instructedAmount": {
+            "currency": "EUR",
+            "amount": "123.50"
+        },
+        "creditorName": "Merchant A",
+        "creditorAccount": {
+            "bic": "ABCIDEFFXXX",
+            "iban": "DE02100100109307118603"
+        }
+    }
+
+### Resource server signals insufficient_authorization_details
+
+Resource server requires payment approval and responds with:
+
+    HTTP/1.1 403 Forbidden
+    WWW-Authenticate: Bearer error="insufficient_authorization_details",
+        resource_metadata="https://server.example.com/.well-known/oauth-protected-resource/payments",
+        authorization_details=W3sKICAgICJ0eXBlIjogInBheW1lbnRfaW5pdGlhdGlvbiIsCiAgICAibG9jYXRpb25zIjogWwogICAgICAgICJodHRwczovL2V4YW1wbGUuY29tL3BheW1lbnRzIgogICAgXSwKICAgICJpbnN0cnVjdGVkQW1vdW50IjogewogICAgICAgICJjdXJyZW5jeSI6ICJFVVIiLAogICAgICAgICJhbW91bnQiOiAiMTIzLjUwIgogICAgfSwKICAgICJjcmVkaXRvck5hbWUiOiAiTWVyY2hhbnQgQSIsCiAgICAiY3JlZGl0b3JBY2NvdW50IjogewogICAgICAgICJiaWMiOiAiQUJDSURFRkZYWFgiLAogICAgICAgICJpYmFuIjogIkRFMDIxMDAxMDAxMDkzMDcxMTg2MDMiCiAgICB9LAogICAgImludGVyYWN0aW9uSWQiOiAiZjgxZDRmYWUtN2RlYy0xMWQwLWE3NjUtMDBhMGM5MWU2YmY2IiwKCSJyaXNrUHJvZmlsZSI6ICJCLTcxIgp9XQ==
+
+The base64 encoded authorization_details decodes to:
+
+    [{
+        "type": "payment_initiation",
+        "locations": [
+            "https://example.com/payments"
+        ],
+        "instructedAmount": {
+            "currency": "EUR",
+            "amount": "123.50"
+        },
+        "creditorName": "Merchant A",
+        "creditorAccount": {
+            "bic": "ABCIDEFFXXX",
+            "iban": "DE02100100109307118603"
+        },
+        "interactionId": "f81d4fae-7dec-11d0-a765-00a0c91e6bf6",
+        "riskProfile": "B-71"
+    }]
+
+Note the resource server has added the ephemeral attributes: `interactionId`, `riskProfile`.
+
+### Client initiates OAuth flow using the provided authorization_details object
+
+After user approves the request, client obtains single-use access token representing the approved payment
+
+### Client re-attempts API request
+
+    POST /payments HTTP/1.1
+    Host: server.example.com
+    Content-Type: application/json
+    Authorization: Bearer eyj... (payment approval access token)
+
+    {
+        "type": "payment_initiation",
+        "locations": [
+            "https://server.example.com/payments"
+        ],
+        "instructedAmount": {
+            "currency": "EUR",
+            "amount": "123.50"
+        },
+        "creditorName": "Merchant A",
+        "creditorAccount": {
+            "bic": "ABCIDEFFXXX",
+            "iban": "DE02100100109307118603"
+        }
+    }
+
+### Resource server authorizes the request
+
+    HTTP/1.1 201 Accepted
+    Content-Type: application/json
+    Cache-Control: no-store
+
+    {
+        "paymentId": "a81bc81b-dead-4e5d-abff-90865d1e13b1",
+        "status": "accepted"
+    }
 
 # Document History
 
